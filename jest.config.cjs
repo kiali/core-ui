@@ -11,6 +11,11 @@ module.exports = {
       branch: 90
     }
   },
+  coverageReporters: [
+    "json-summary", 
+    "text",
+    "lcov"
+  ],
   coverageDirectory: '.coverage',
   testEnvironment: 'jsdom',
   setupFilesAfterEnv: [ "@testing-library/jest-dom/extend-expect" ],

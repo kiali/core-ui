@@ -1,0 +1,43 @@
+name: Test
+on:
+  # Run on master and release branches
+  push:
+    branches: [main, "^v\\d+\\.\\d+$"]
+  pull_request:
+    branches: [main, "^v\\d+\\.\\d+$"]
+
+jobs: 
+  test:
+    name: Test and coverage
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.build_branch }}   
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "14"
+          cache: yarn
+          cache-dependency-path: ./yarn.lock        
+      - name: Install
+        run: yarn install
+      - name: Run test and coverage      
+        run: yarn test && yarn badges
+  badges:
+    name: Create badges
+    if: ${{ github.event.pull_request.merged }}
+    steps:
+      - name: Configure git
+        run: |
+          git config user.email 'kiali-dev@googlegroups.com'
+          git config user.name 'kiali-bot'
+      - name: Run badges
+        run: |
+          yarn badges
+          PR=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+          git add --force .badges/*
+          git commit -m "Update badges of $PR"
+          git push
+      
