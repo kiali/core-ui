@@ -25,12 +25,8 @@ jobs:
         run: yarn install
       - name: Run test and coverage      
         run: yarn test && yarn badges
-  badges:
-    name: Create badges
-    runs-on: ubuntu-20.04
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - name: Configure git
+      - name: Push badges
+        if: ${{ github.ref == 'ref/heads/main' }}
         run: |
           git config user.email 'kiali-dev@googlegroups.com'
           git config user.name 'kiali-bot'
