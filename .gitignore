@@ -7,6 +7,7 @@ tsc_out
 .DS_Store
 coverage
 .coverage
+.badges
 .cache
 .tmp
 .eslintcache
