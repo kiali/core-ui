@@ -34,11 +34,6 @@ jobs:
         run: |
           git config user.email 'kiali-dev@googlegroups.com'
           git config user.name 'kiali-bot'
-      - name: Run badges
-        run: |
-          yarn badges
-          PR=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
           git add --force .badges/*
-          git commit -m "Update badges of $PR"
-          git push
-      
+          git commit -m "Update badges"
+          git push     
