@@ -27,6 +27,7 @@ jobs:
         run: yarn test && yarn badges
   badges:
     name: Create badges
+    runs-on: ubuntu-20.04
     if: ${{ github.event.pull_request.merged }}
     steps:
       - name: Configure git
