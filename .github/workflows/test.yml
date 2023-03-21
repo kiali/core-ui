@@ -28,7 +28,7 @@ jobs:
   badges:
     name: Create badges
     runs-on: ubuntu-20.04
-    if: ${{ github.event.pull_request.merged }}
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Configure git
         run: |
