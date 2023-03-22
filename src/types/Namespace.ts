@@ -1,4 +1,4 @@
 export interface Namespace {
-    name: string;
-    labels?: { [key: string]: string };
+  name: string;
+  labels?: { [key: string]: string };
 }
