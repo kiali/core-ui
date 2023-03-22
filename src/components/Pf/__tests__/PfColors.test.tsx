@@ -1,4 +1,4 @@
-import { PFColors, setPFColorVals } from '../';
+import { PFColors, PFColorVals, setPFColorVals } from '../';
 
 describe('PFColorVals', () => {
   test('Expect PFColors object', () => {
@@ -53,9 +53,86 @@ describe('PFColorVals', () => {
 /*
   Mock this method
 */
-describe('setPFColorVals', () => {
-  test('Expect elemtn has that properties', () => {
-    const mockElement = document.createElement('div');
-    setPFColorVals(mockElement);
-  });
+test('Expect elemnt has that properties', () => {
+  const mockElement = document.createElement('div');
+  setPFColorVals(mockElement);
+});
+
+// Tests that the function does not overwrite an already defined pfcolorvals object. tags: [happy path]
+test('test_defined_PFColorVals', () => {
+  // Arrange
+  const element = document.createElement('div');
+  const PFColorVals = { test: 'value' };
+
+  // Act
+  setPFColorVals(element);
+
+  // Assert
+  expect(PFColorVals).toEqual({ test: 'value' });
+});
+// Tests that the function does not modify any variables or objects outside of pfcolorvals. tags: [general behavior]
+test('test_no_side_effects', () => {
+  // Arrange
+  const element = document.createElement('div');
+  const initialPFColorVals = { test: 'value' };
+  const expectedPFColorVals = {
+    Black100: '',
+    Black150: '',
+    Black200: '',
+    Black300: '',
+    Black500: '',
+    Black600: '',
+    Black700: '',
+    Black1000: '',
+    Blue50: '',
+    Blue300: '',
+    Blue600: '',
+    Gold400: '',
+    Green400: '',
+    Purple200: '',
+    White: '',
+    Danger: '',
+    Success: '#3E8635',
+    Warning: ''
+  };
+  Object.assign(PFColorVals, initialPFColorVals);
+
+  // Act
+  setPFColorVals(element);
+
+  // Assert
+  expect(PFColorVals).toEqual(expectedPFColorVals);
+  expect(initialPFColorVals).toEqual({ test: 'value' });
+});
+
+// Tests that the function sets the corresponding color variable to an empty string when a css variable is not defined. tags: [edge case]
+test('test_missing_CSS_variable', () => {
+  // Arrange
+  const element = document.createElement('div');
+  const expectedPFColorVals = {
+    Black100: '',
+    Black150: '',
+    Black200: '',
+    Black300: '',
+    Black500: '',
+    Black600: '',
+    Black700: '',
+    Black1000: '',
+    Blue50: '',
+    Blue300: '',
+    Blue600: '',
+    Gold400: '',
+    Green400: '',
+    Purple200: '',
+    White: '',
+    Danger: '',
+    Success: '#3E8635',
+    Warning: ''
+  };
+
+  // Act
+  setPFColorVals(element);
+
+  // Assert
+  expect(PFColorVals).toEqual(expectedPFColorVals);
 });
