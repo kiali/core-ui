@@ -20,6 +20,7 @@
   "author": "Red Hat",
   "devDependencies": {
     "@rollup/plugin-commonjs": "24.0.1",
+    "@rollup/plugin-json": "^6.0.0",
     "@rollup/plugin-node-resolve": "15.0.1",
     "@testing-library/dom": "9.0.1",
     "@testing-library/jest-dom": "5.16.2",
