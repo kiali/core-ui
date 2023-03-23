@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "es5",
     "outDir": "lib",
+    "rootDir": "src",
     "lib": ["dom", "dom.iterable", "esnext"],
     "declaration": true,
     "declarationDir": "lib",
@@ -16,8 +17,19 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react"
+    "jsx": "react",  
+    "sourceMap": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noImplicitAny": false,
+    "strictNullChecks": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "useUnknownInCatchVariables": false
   },
   "include": ["src"],
   "exclude": ["node_modules", "lib"]
 }
+
+

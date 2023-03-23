@@ -23,6 +23,8 @@ jobs:
           cache-dependency-path: ./yarn.lock        
       - name: Install
         run: yarn install
+      - name: Linter
+        run: yarn lint  
       - name: Run test and coverage      
         run: yarn test && yarn badges
       - name: Push badges
