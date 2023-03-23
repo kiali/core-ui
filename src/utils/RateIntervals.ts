@@ -12,5 +12,5 @@ export const getName = (durationSeconds: number): string => {
 
 export const getRefreshIntervalName = (refreshInterval: IntervalInMilliseconds): string => {
   const refreshIntervalOption = config.toolbar.refreshInterval[refreshInterval];
-  return refreshIntervalOption.replace('Every ', '');
+  return refreshIntervalOption ? refreshIntervalOption.replace('Every ', '') : '';
 };
