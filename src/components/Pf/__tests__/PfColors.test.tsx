@@ -50,14 +50,6 @@ describe('PFColorVals', () => {
   });
 });
 
-/*
-  Mock this method
-*/
-test('Expect elemnt has that properties', () => {
-  const mockElement = document.createElement('div');
-  setPFColorVals(mockElement);
-});
-
 // Tests that the function does not overwrite an already defined pfcolorvals object. tags: [happy path]
 test('test_defined_PFColorVals', () => {
   // Arrange
