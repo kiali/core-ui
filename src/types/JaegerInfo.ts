@@ -4,6 +4,11 @@
 
 import { Target } from './MetricsOptions';
 
+export type JaegerState = {
+  info?: JaegerInfo;
+  selectedTrace?: JaegerTrace;
+};
+
 export interface JaegerInfo {
   enabled: boolean;
   integration: boolean;
