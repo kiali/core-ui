@@ -1,6 +1,6 @@
 # Kiali Core
 
-[![Kiali Core badge](https://img.shields.io/npm/v/@kiali/core.svg?label=PF4%20Core&style=for-the-badge)](https://www.npmjs.com/package/@kiali/core) 
+[![Kiali Core badge](https://img.shields.io/npm/v/@kiali/core.svg?label=PF4%20Core&style=for-the-badge)](https://www.npmjs.com/package/@kiali/core)
 
 ## Coverage Status
 
@@ -9,9 +9,84 @@
 ![Coverage branches](.badges/badge-branches.svg)
 ![Coverage statements](.badges/badge-statements.svg)
 
-## Guidelines
+## Development Setup
 
-# Semantic Commit Messages
+In order to work and test locally with Kiali core components you have to link the library with a UI application through `yarn link`.
+
+Assuming your working directory tree is:
+
+```
+-- work
+|- application-ui
+|- core-ui
+```
+
+Before linking core-ui library, react and react-dom dependencies from application ui need to be linked to use same version in both places.
+
+```sh
+cd work/application-ui
+# Install application-ui dependencies
+yarn install
+
+# Sometimes, yarn link is ignored because there is a link of same library in another place.
+# In this case you have to unlink first with yarn unlink (https://github.com/yarnpkg/yarn/issues/7216)
+
+cd work/application-ui/node_modules/react
+# Create link for react
+yarn link
+
+cd work/application-ui/node_modules/react-dom
+# Create link for react-dom
+yarn link
+```
+
+Then core-ui library link is created and use react and react-dom links in the library.
+
+```sh
+cd work/core-ui
+# Create link for core-ui
+yarn link
+
+# Install core-ui library dependencies
+yarn install
+
+# Link react library
+yarn link react
+
+# Link react-dom library
+yarn link react-dom
+```
+
+Finally use core-ui link in the application.
+
+```sh
+cd work/application-ui
+# Link core-ui library
+yarn link @kiali/core-ui
+```
+
+After testing Kiali core components, you should remove the links:
+
+```sh
+cd work/application-ui
+# Unlink core-ui library
+yarn unlink @kiali/core-ui
+
+# Reinstalling application-ui dependencies
+yarn install
+
+cd work/core-ui
+# Unlink react library
+yarn unlink react
+
+# Unlink react-dom library
+yarn unlink react-dom
+
+# Reinstalling core-ui dependencies
+yarn install
+```
+
+## Semantic Commit Messages
 
 We should set commit message with this format:
 
@@ -19,7 +94,7 @@ Format: `<type>(<scope>): <subject>`
 
 `<scope>` is optional
 
-## Example
+### Example
 
 ```
 feat: add hat wobble
