@@ -60,13 +60,17 @@ const loginHeaders = config.login.headers;
 
 /**  Helpers to Requests */
 
-const getHeaders = () => {
-  return { ...loginHeaders };
+const getHeaders = (proxyUrl: string | null) => {
+  if (proxyUrl) {
+    return { 'Content-Type': 'application/x-www-form-urlencoded' };
+  } else {
+    return { ...loginHeaders };
+  }
 };
 
 /** Create content type correctly for a given request type */
-const getHeadersWithMethod = method => {
-  var allHeaders = getHeaders();
+const getHeadersWithMethod = (method: HTTP_VERBS, proxyUrl: string | null) => {
+  let allHeaders = getHeaders(proxyUrl);
   if (method === HTTP_VERBS.PATCH) {
     allHeaders['Content-Type'] = 'application/json';
   }
@@ -78,12 +82,12 @@ const basicAuth = (username: UserName, password: Password) => {
   return { username: username, password: password };
 };
 
-const newRequest = <P>(method: HTTP_VERBS, url: string, queryParams: any, data: any) =>
+const newRequest = <P>(method: HTTP_VERBS, proxyUrl: string | null, url: string, queryParams: any, data: any) =>
   axios.request<P>({
     method: method,
-    url: url,
+    url: (proxyUrl ? proxyUrl + '/' : '') + url,
     data: data,
-    headers: getHeadersWithMethod(method),
+    headers: getHeadersWithMethod(method, proxyUrl),
     params: queryParams
   });
 
@@ -94,107 +98,87 @@ interface LoginRequest {
 }
 
 /** Requests */
-export const extendSession = (kialiUrl: string | null = null) => {
-  return newRequest<LoginSession>(HTTP_VERBS.GET, (kialiUrl ? kialiUrl + '/' : '') + urls.authenticate, {}, {});
+export const extendSession = (proxyUrl: string | null = null) => {
+  return newRequest<LoginSession>(HTTP_VERBS.GET, proxyUrl, urls.authenticate, {}, {});
 };
 
 export const login = async (
   request: LoginRequest = { username: ANONYMOUS_USER, password: 'anonymous', token: '' },
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ): Promise<Response<LoginSession>> => {
   const params = new URLSearchParams();
   params.append('token', request.token);
 
   return axios({
     method: HTTP_VERBS.POST,
-    url: (kialiUrl ? kialiUrl + '/' : '') + urls.authenticate,
-    headers: getHeaders(),
+    url: (proxyUrl ? proxyUrl + '/' : '') + urls.authenticate,
+    headers: getHeaders(proxyUrl),
     auth: basicAuth(request.username, request.password),
     data: params
   });
 };
 
-export const logout = (kialiUrl: string | null = null) => {
-  return newRequest<undefined>(HTTP_VERBS.GET, (kialiUrl ? kialiUrl + '/' : '') + urls.logout, {}, {});
+export const logout = (proxyUrl: string | null = null) => {
+  return newRequest<undefined>(HTTP_VERBS.GET, proxyUrl, urls.logout, {}, {});
 };
 
-export const getAuthInfo = async (kialiUrl: string | null = null) => {
-  return newRequest<AuthInfo>(HTTP_VERBS.GET, (kialiUrl ? kialiUrl + '/' : '') + urls.authInfo, {}, {});
+export const getAuthInfo = async (proxyUrl: string | null = null) => {
+  return newRequest<AuthInfo>(HTTP_VERBS.GET, proxyUrl, urls.authInfo, {}, {});
 };
 
 export const checkOpenshiftAuth = async (
   data: any,
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ): Promise<Response<LoginSession>> => {
-  return newRequest<LoginSession>(HTTP_VERBS.POST, (kialiUrl ? kialiUrl + '/' : '') + urls.authenticate, {}, data);
+  return newRequest<LoginSession>(HTTP_VERBS.POST, proxyUrl, urls.authenticate, {}, data);
 };
 
-export const getStatus = (kialiUrl: string | null = null) => {
-  return newRequest<StatusState>(HTTP_VERBS.GET, (kialiUrl ? kialiUrl + '/' : '') + urls.status, {}, {});
+export const getStatus = (proxyUrl: string | null = null) => {
+  return newRequest<StatusState>(HTTP_VERBS.GET, proxyUrl, urls.status, {}, {});
 };
 
-export const getNamespaces = (kialiUrl: string | null = null) => {
-  return newRequest<Namespace[]>(HTTP_VERBS.GET, (kialiUrl ? kialiUrl + '/' : '') + urls.namespaces, {}, {});
+export const getNamespaces = (proxyUrl: string | null = null) => {
+  return newRequest<Namespace[]>(HTTP_VERBS.GET, proxyUrl, urls.namespaces, {}, {});
 };
 
-export const getNamespaceMetrics = (namespace: string, params: IstioMetricsOptions, kialiUrl: string | null = null) => {
-  return newRequest<Readonly<IstioMetricsMap>>(
-    HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.namespaceMetrics(namespace),
-    params,
-    {}
-  );
+export const getNamespaceMetrics = (namespace: string, params: IstioMetricsOptions, proxyUrl: string | null = null) => {
+  return newRequest<Readonly<IstioMetricsMap>>(HTTP_VERBS.GET, proxyUrl, urls.namespaceMetrics(namespace), params, {});
 };
 
-export const getMeshTls = (kialiUrl: string | null = null) => {
-  return newRequest<TLSStatus>(HTTP_VERBS.GET, (kialiUrl ? kialiUrl + '/' : '') + urls.meshTls(), {}, {});
+export const getMeshTls = (proxyUrl: string | null = null) => {
+  return newRequest<TLSStatus>(HTTP_VERBS.GET, proxyUrl, urls.meshTls(), {}, {});
 };
 
-export const getOutboundTrafficPolicyMode = (kialiUrl: string | null = null) => {
-  return newRequest<OutboundTrafficPolicy>(
-    HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.outboundTrafficPolicyMode(),
-    {},
-    {}
-  );
+export const getOutboundTrafficPolicyMode = (proxyUrl: string | null = null) => {
+  return newRequest<OutboundTrafficPolicy>(HTTP_VERBS.GET, proxyUrl, urls.outboundTrafficPolicyMode(), {}, {});
 };
 
-export const getIstioStatus = (kialiUrl: string | null = null) => {
-  return newRequest<ComponentStatus[]>(HTTP_VERBS.GET, (kialiUrl ? kialiUrl + '/' : '') + urls.istioStatus(), {}, {});
+export const getIstioStatus = (proxyUrl: string | null = null) => {
+  return newRequest<ComponentStatus[]>(HTTP_VERBS.GET, proxyUrl, urls.istioStatus(), {}, {});
 };
 
-export const getIstioCertsInfo = (kialiUrl: string | null = null) => {
-  return newRequest<CertsInfo[]>(HTTP_VERBS.GET, (kialiUrl ? kialiUrl + '/' : '') + urls.istioCertsInfo(), {}, {});
+export const getIstioCertsInfo = (proxyUrl: string | null = null) => {
+  return newRequest<CertsInfo[]>(HTTP_VERBS.GET, proxyUrl, urls.istioCertsInfo(), {}, {});
 };
 
-export const getIstiodResourceThresholds = (kialiUrl: string | null = null) => {
-  return newRequest<IstiodResourceThresholds>(
-    HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.istiodResourceThresholds(),
-    {},
-    {}
-  );
+export const getIstiodResourceThresholds = (proxyUrl: string | null = null) => {
+  return newRequest<IstiodResourceThresholds>(HTTP_VERBS.GET, proxyUrl, urls.istiodResourceThresholds(), {}, {});
 };
 
-export const getNamespaceTls = (namespace: string, kialiUrl: string | null = null) => {
-  return newRequest<TLSStatus>(HTTP_VERBS.GET, (kialiUrl ? kialiUrl + '/' : '') + urls.namespaceTls(namespace), {}, {});
+export const getNamespaceTls = (namespace: string, proxyUrl: string | null = null) => {
+  return newRequest<TLSStatus>(HTTP_VERBS.GET, proxyUrl, urls.namespaceTls(namespace), {}, {});
 };
 
-export const getNamespaceValidations = (namespace: string, kialiUrl: string | null = null) => {
-  return newRequest<ValidationStatus>(
-    HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.namespaceValidations(namespace),
-    {},
-    {}
-  );
+export const getNamespaceValidations = (namespace: string, proxyUrl: string | null = null) => {
+  return newRequest<ValidationStatus>(HTTP_VERBS.GET, proxyUrl, urls.namespaceValidations(namespace), {}, {});
 };
 
 export const updateNamespace = (
   namespace: string,
   jsonPatch: string,
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ): Promise<Response<string>> => {
-  return newRequest(HTTP_VERBS.PATCH, (kialiUrl ? kialiUrl + '/' : '') + urls.namespace(namespace), {}, jsonPatch);
+  return newRequest(HTTP_VERBS.PATCH, proxyUrl, urls.namespace(namespace), {}, jsonPatch);
 };
 
 export const getIstioConfig = (
@@ -203,7 +187,7 @@ export const getIstioConfig = (
   validate: boolean,
   labelSelector: string,
   workloadSelector: string,
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ): Promise<Response<IstioConfigList>> => {
   const params: any = objects && objects.length > 0 ? { objects: objects.join(',') } : {};
   if (validate) {
@@ -215,12 +199,7 @@ export const getIstioConfig = (
   if (workloadSelector) {
     params.workloadSelector = workloadSelector;
   }
-  return newRequest<IstioConfigList>(
-    HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.istioConfig(namespace),
-    params,
-    {}
-  );
+  return newRequest<IstioConfigList>(HTTP_VERBS.GET, proxyUrl, urls.istioConfig(namespace), params, {});
 };
 
 export const getAllIstioConfigs = (
@@ -229,7 +208,7 @@ export const getAllIstioConfigs = (
   validate: boolean,
   labelSelector: string,
   workloadSelector: string,
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ): Promise<Response<IstioConfigsMap>> => {
   const params: any = namespaces && namespaces.length > 0 ? { namespaces: namespaces.join(',') } : {};
   if (objects && objects.length > 0) {
@@ -244,12 +223,7 @@ export const getAllIstioConfigs = (
   if (workloadSelector) {
     params.workloadSelector = workloadSelector;
   }
-  return newRequest<IstioConfigsMap>(
-    HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.allIstioConfigs(),
-    params,
-    {}
-  );
+  return newRequest<IstioConfigsMap>(HTTP_VERBS.GET, proxyUrl, urls.allIstioConfigs(), params, {});
 };
 
 export const getIstioConfigDetail = (
@@ -257,11 +231,12 @@ export const getIstioConfigDetail = (
   objectType: string,
   object: string,
   validate: boolean,
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ) => {
   return newRequest<IstioConfigDetails>(
     HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.istioConfigDetail(namespace, objectType, object),
+    proxyUrl,
+    urls.istioConfigDetail(namespace, objectType, object),
     validate ? { validate: true, help: true } : {},
     {}
   );
@@ -271,14 +246,9 @@ export const deleteIstioConfigDetail = (
   namespace: string,
   objectType: string,
   object: string,
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ) => {
-  return newRequest<string>(
-    HTTP_VERBS.DELETE,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.istioConfigDetail(namespace, objectType, object),
-    {},
-    {}
-  );
+  return newRequest<string>(HTTP_VERBS.DELETE, proxyUrl, urls.istioConfigDetail(namespace, objectType, object), {}, {});
 };
 
 export const updateIstioConfigDetail = (
@@ -286,34 +256,25 @@ export const updateIstioConfigDetail = (
   objectType: string,
   object: string,
   jsonPatch: string,
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ): Promise<Response<string>> => {
-  return newRequest(
-    HTTP_VERBS.PATCH,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.istioConfigDetail(namespace, objectType, object),
-    {},
-    jsonPatch
-  );
+  return newRequest(HTTP_VERBS.PATCH, proxyUrl, urls.istioConfigDetail(namespace, objectType, object), {}, jsonPatch);
 };
 
 export const createIstioConfigDetail = (
   namespace: string,
   objectType: string,
   json: string,
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ): Promise<Response<string>> => {
-  return newRequest(
-    HTTP_VERBS.POST,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.istioConfigCreate(namespace, objectType),
-    {},
-    json
-  );
+  return newRequest(HTTP_VERBS.POST, proxyUrl, urls.istioConfigCreate(namespace, objectType), {}, json);
 };
 
-export const getConfigValidations = (namespaces: string[], kialiUrl: string | null = null) => {
+export const getConfigValidations = (namespaces: string[], proxyUrl: string | null = null) => {
   return newRequest<ValidationStatus>(
     HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.configValidations(),
+    proxyUrl,
+    urls.configValidations(),
     { namespaces: namespaces.join(',') },
     {}
   );
@@ -322,42 +283,27 @@ export const getConfigValidations = (namespaces: string[], kialiUrl: string | nu
 export const getServices = (
   namespace: string,
   params: { [key: string]: string } = {},
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ) => {
-  return newRequest<ServiceList>(
-    HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.services(namespace),
-    params,
-    {}
-  );
+  return newRequest<ServiceList>(HTTP_VERBS.GET, proxyUrl, urls.services(namespace), params, {});
 };
 
 export const getServiceMetrics = (
   namespace: string,
   service: string,
   params: IstioMetricsOptions,
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ) => {
-  return newRequest<IstioMetricsMap>(
-    HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.serviceMetrics(namespace, service),
-    params,
-    {}
-  );
+  return newRequest<IstioMetricsMap>(HTTP_VERBS.GET, proxyUrl, urls.serviceMetrics(namespace, service), params, {});
 };
 
 export const getServiceDashboard = (
   namespace: string,
   service: string,
   params: IstioMetricsOptions,
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ) => {
-  return newRequest<DashboardModel>(
-    HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.serviceDashboard(namespace, service),
-    params,
-    {}
-  );
+  return newRequest<DashboardModel>(HTTP_VERBS.GET, proxyUrl, urls.serviceDashboard(namespace, service), params, {});
 };
 
 export const getAggregateMetrics = (
@@ -365,11 +311,12 @@ export const getAggregateMetrics = (
   aggregate: string,
   aggregateValue: string,
   params: IstioMetricsOptions,
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ) => {
   return newRequest<IstioMetricsMap>(
     HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.aggregateMetrics(namespace, aggregate, aggregateValue),
+    proxyUrl,
+    urls.aggregateMetrics(namespace, aggregate, aggregateValue),
     params,
     {}
   );
@@ -379,85 +326,60 @@ export const getApp = (
   namespace: string,
   app: string,
   params?: { [key: string]: string },
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ) => {
-  return newRequest<App>(HTTP_VERBS.GET, (kialiUrl ? kialiUrl + '/' : '') + urls.app(namespace, app), params, {});
+  return newRequest<App>(HTTP_VERBS.GET, proxyUrl, urls.app(namespace, app), params, {});
 };
 
-export const getApps = (namespace: string, params: any = {}, kialiUrl: string | null = null) => {
-  return newRequest<AppList>(HTTP_VERBS.GET, (kialiUrl ? kialiUrl + '/' : '') + urls.apps(namespace), params, {});
+export const getApps = (namespace: string, params: any = {}, proxyUrl: string | null = null) => {
+  return newRequest<AppList>(HTTP_VERBS.GET, proxyUrl, urls.apps(namespace), params, {});
 };
 
 export const getAppMetrics = (
   namespace: string,
   app: string,
   params: IstioMetricsOptions,
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ) => {
-  return newRequest<IstioMetricsMap>(
-    HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.appMetrics(namespace, app),
-    params,
-    {}
-  );
+  return newRequest<IstioMetricsMap>(HTTP_VERBS.GET, proxyUrl, urls.appMetrics(namespace, app), params, {});
 };
 
 export const getAppDashboard = (
   namespace: string,
   app: string,
   params: IstioMetricsOptions,
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ) => {
-  return newRequest<DashboardModel>(
-    HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.appDashboard(namespace, app),
-    params,
-    {}
-  );
+  return newRequest<DashboardModel>(HTTP_VERBS.GET, proxyUrl, urls.appDashboard(namespace, app), params, {});
 };
 
 export const getWorkloadMetrics = (
   namespace: string,
   workload: string,
   params: IstioMetricsOptions,
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ) => {
-  return newRequest<IstioMetricsMap>(
-    HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.workloadMetrics(namespace, workload),
-    params,
-    {}
-  );
+  return newRequest<IstioMetricsMap>(HTTP_VERBS.GET, proxyUrl, urls.workloadMetrics(namespace, workload), params, {});
 };
 
 export const getWorkloadDashboard = (
   namespace: string,
   workload: string,
   params: IstioMetricsOptions,
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ) => {
-  return newRequest<DashboardModel>(
-    HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.workloadDashboard(namespace, workload),
-    params,
-    {}
-  );
+  return newRequest<DashboardModel>(HTTP_VERBS.GET, proxyUrl, urls.workloadDashboard(namespace, workload), params, {});
 };
 
-export const getCustomDashboard = (ns: string, tpl: string, params: DashboardQuery, kialiUrl: string | null = null) => {
-  return newRequest<DashboardModel>(
-    HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.customDashboard(ns, tpl),
-    params,
-    {}
-  );
+export const getCustomDashboard = (ns: string, tpl: string, params: DashboardQuery, proxyUrl: string | null = null) => {
+  return newRequest<DashboardModel>(HTTP_VERBS.GET, proxyUrl, urls.customDashboard(ns, tpl), params, {});
 };
 
 export const getNamespaceAppHealth = (
   namespace: string,
   duration: DurationInSeconds,
   queryTime?: TimeInSeconds,
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ): Promise<NamespaceAppHealth> => {
   const params: any = {
     type: 'app'
@@ -468,25 +390,22 @@ export const getNamespaceAppHealth = (
   if (queryTime) {
     params.queryTime = String(queryTime);
   }
-  return newRequest<NamespaceAppHealth>(
-    HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.namespaceHealth(namespace),
-    params,
-    {}
-  ).then(response => {
-    const ret: NamespaceAppHealth = {};
-    Object.keys(response.data).forEach(k => {
-      ret[k] = AppHealth.fromJson(namespace, k, response.data[k], { rateInterval: duration, hasSidecar: true });
-    });
-    return ret;
-  });
+  return newRequest<NamespaceAppHealth>(HTTP_VERBS.GET, proxyUrl, urls.namespaceHealth(namespace), params, {}).then(
+    response => {
+      const ret: NamespaceAppHealth = {};
+      Object.keys(response.data).forEach(k => {
+        ret[k] = AppHealth.fromJson(namespace, k, response.data[k], { rateInterval: duration, hasSidecar: true });
+      });
+      return ret;
+    }
+  );
 };
 
 export const getNamespaceServiceHealth = (
   namespace: string,
   duration: DurationInSeconds,
   queryTime?: TimeInSeconds,
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ): Promise<NamespaceServiceHealth> => {
   const params: any = {
     type: 'service'
@@ -497,28 +416,25 @@ export const getNamespaceServiceHealth = (
   if (queryTime) {
     params.queryTime = String(queryTime);
   }
-  return newRequest<NamespaceServiceHealth>(
-    HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.namespaceHealth(namespace),
-    params,
-    {}
-  ).then(response => {
-    const ret: NamespaceServiceHealth = {};
-    Object.keys(response.data).forEach(k => {
-      ret[k] = ServiceHealth.fromJson(namespace, k, response.data[k], {
-        rateInterval: duration,
-        hasSidecar: true
+  return newRequest<NamespaceServiceHealth>(HTTP_VERBS.GET, proxyUrl, urls.namespaceHealth(namespace), params, {}).then(
+    response => {
+      const ret: NamespaceServiceHealth = {};
+      Object.keys(response.data).forEach(k => {
+        ret[k] = ServiceHealth.fromJson(namespace, k, response.data[k], {
+          rateInterval: duration,
+          hasSidecar: true
+        });
       });
-    });
-    return ret;
-  });
+      return ret;
+    }
+  );
 };
 
 export const getNamespaceWorkloadHealth = (
   namespace: string,
   duration: DurationInSeconds,
   queryTime?: TimeInSeconds,
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ): Promise<NamespaceWorkloadHealth> => {
   const params: any = {
     type: 'workload'
@@ -531,7 +447,8 @@ export const getNamespaceWorkloadHealth = (
   }
   return newRequest<NamespaceWorkloadHealth>(
     HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.namespaceHealth(namespace),
+    proxyUrl,
+    urls.namespaceHealth(namespace),
     params,
     {}
   ).then(response => {
@@ -546,103 +463,79 @@ export const getNamespaceWorkloadHealth = (
   });
 };
 
-export const getGrafanaInfo = (kialiUrl: string | null = null) => {
-  return newRequest<GrafanaInfo>(HTTP_VERBS.GET, (kialiUrl ? kialiUrl + '/' : '') + urls.grafana, {}, {});
+export const getGrafanaInfo = (proxyUrl: string | null = null) => {
+  return newRequest<GrafanaInfo>(HTTP_VERBS.GET, proxyUrl, urls.grafana, {}, {});
 };
 
-export const getJaegerInfo = (kialiUrl: string | null = null) => {
-  return newRequest<JaegerInfo>(HTTP_VERBS.GET, (kialiUrl ? kialiUrl + '/' : '') + urls.jaeger, {}, {});
+export const getJaegerInfo = (proxyUrl: string | null = null) => {
+  return newRequest<JaegerInfo>(HTTP_VERBS.GET, proxyUrl, urls.jaeger, {}, {});
 };
 
-export const getAppTraces = (namespace: string, app: string, params: TracingQuery, kialiUrl: string | null = null) => {
-  return newRequest<JaegerResponse>(
-    HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.appTraces(namespace, app),
-    params,
-    {}
-  );
+export const getAppTraces = (namespace: string, app: string, params: TracingQuery, proxyUrl: string | null = null) => {
+  return newRequest<JaegerResponse>(HTTP_VERBS.GET, proxyUrl, urls.appTraces(namespace, app), params, {});
 };
 
 export const getServiceTraces = (
   namespace: string,
   service: string,
   params: TracingQuery,
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ) => {
-  return newRequest<JaegerResponse>(
-    HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.serviceTraces(namespace, service),
-    params,
-    {}
-  );
+  return newRequest<JaegerResponse>(HTTP_VERBS.GET, proxyUrl, urls.serviceTraces(namespace, service), params, {});
 };
 
 export const getWorkloadTraces = (
   namespace: string,
   workload: string,
   params: TracingQuery,
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ) => {
-  return newRequest<JaegerResponse>(
-    HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.workloadTraces(namespace, workload),
-    params,
-    {}
-  );
+  return newRequest<JaegerResponse>(HTTP_VERBS.GET, proxyUrl, urls.workloadTraces(namespace, workload), params, {});
 };
 
 export const getJaegerErrorTraces = (
   namespace: string,
   service: string,
   duration: DurationInSeconds,
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ) => {
   return newRequest<number>(
     HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.jaegerErrorTraces(namespace, service),
+    proxyUrl,
+    urls.jaegerErrorTraces(namespace, service),
     { duration: duration },
     {}
   );
 };
 
-export const getJaegerTrace = (idTrace: string, kialiUrl: string | null = null) => {
-  return newRequest<JaegerSingleResponse>(
-    HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.jaegerTrace(idTrace),
-    {},
-    {}
-  );
+export const getJaegerTrace = (idTrace: string, proxyUrl: string | null = null) => {
+  return newRequest<JaegerSingleResponse>(HTTP_VERBS.GET, proxyUrl, urls.jaegerTrace(idTrace), {}, {});
 };
 
-export const getGraphElements = (params: any, kialiUrl: string | null = null) => {
-  return newRequest<GraphDefinition>(
-    HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.namespacesGraphElements,
-    params,
-    {}
-  );
+export const getGraphElements = (params: any, proxyUrl: string | null = null) => {
+  return newRequest<GraphDefinition>(HTTP_VERBS.GET, proxyUrl, urls.namespacesGraphElements, params, {});
 };
 
-export const getNodeGraphElements = (node: NodeParamsType, params: any, kialiUrl: string | null = null) => {
+export const getNodeGraphElements = (node: NodeParamsType, params: any, proxyUrl: string | null = null) => {
   switch (node.nodeType) {
     case NodeType.AGGREGATE:
       return !node.service
         ? newRequest<GraphDefinition>(
             HTTP_VERBS.GET,
-            (kialiUrl ? kialiUrl + '/' : '') +
-              urls.aggregateGraphElements(node.namespace.name, node.aggregate!, node.aggregateValue!),
+            proxyUrl,
+            urls.aggregateGraphElements(node.namespace.name, node.aggregate!, node.aggregateValue!),
             params,
             {}
           )
         : newRequest<GraphDefinition>(
             HTTP_VERBS.GET,
-            (kialiUrl ? kialiUrl + '/' : '') +
-              urls.aggregateByServiceGraphElements(
-                node.namespace.name,
-                node.aggregate!,
-                node.aggregateValue!,
-                node.service
-              ),
+            proxyUrl,
+            urls.aggregateByServiceGraphElements(
+              node.namespace.name,
+              node.aggregate!,
+              node.aggregateValue!,
+              node.service
+            ),
             params,
             {}
           );
@@ -650,21 +543,24 @@ export const getNodeGraphElements = (node: NodeParamsType, params: any, kialiUrl
     case NodeType.BOX: // we only support app box node graphs, so treat like app
       return newRequest<GraphDefinition>(
         HTTP_VERBS.GET,
-        (kialiUrl ? kialiUrl + '/' : '') + urls.appGraphElements(node.namespace.name, node.app, node.version),
+        proxyUrl,
+        urls.appGraphElements(node.namespace.name, node.app, node.version),
         params,
         {}
       );
     case NodeType.SERVICE:
       return newRequest<GraphDefinition>(
         HTTP_VERBS.GET,
-        (kialiUrl ? kialiUrl + '/' : '') + urls.serviceGraphElements(node.namespace.name, node.service),
+        proxyUrl,
+        urls.serviceGraphElements(node.namespace.name, node.service),
         params,
         {}
       );
     case NodeType.WORKLOAD:
       return newRequest<GraphDefinition>(
         HTTP_VERBS.GET,
-        (kialiUrl ? kialiUrl + '/' : '') + urls.workloadGraphElements(node.namespace.name, node.workload),
+        proxyUrl,
+        urls.workloadGraphElements(node.namespace.name, node.workload),
         params,
         {}
       );
@@ -674,8 +570,8 @@ export const getNodeGraphElements = (node: NodeParamsType, params: any, kialiUrl
   }
 };
 
-export const getServerConfig = (kialiUrl: string | null = null) => {
-  return newRequest<ServerConfig>(HTTP_VERBS.GET, (kialiUrl ? kialiUrl + '/' : '') + urls.serverConfig, {}, {});
+export const getServerConfig = (proxyUrl: string | null = null) => {
+  return newRequest<ServerConfig>(HTTP_VERBS.GET, proxyUrl, urls.serverConfig, {}, {});
 };
 
 export const getServiceDetail = (
@@ -683,7 +579,7 @@ export const getServiceDetail = (
   service: string,
   validate: boolean,
   rateInterval?: DurationInSeconds,
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ): Promise<ServiceDetailsInfo> => {
   const params: any = {};
   if (validate) {
@@ -692,49 +588,36 @@ export const getServiceDetail = (
   if (rateInterval) {
     params.rateInterval = `${rateInterval}s`;
   }
-  return newRequest<ServiceDetailsInfo>(
-    HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.service(namespace, service),
-    params,
-    {}
-  ).then(r => {
-    const info: ServiceDetailsInfo = r.data;
-    if (info.health) {
-      // Default rate interval in backend = 600s
-      info.health = ServiceHealth.fromJson(namespace, service, info.health, {
-        rateInterval: rateInterval || 600,
-        hasSidecar: info.istioSidecar
-      });
+  return newRequest<ServiceDetailsInfo>(HTTP_VERBS.GET, proxyUrl, urls.service(namespace, service), params, {}).then(
+    r => {
+      const info: ServiceDetailsInfo = r.data;
+      if (info.health) {
+        // Default rate interval in backend = 600s
+        info.health = ServiceHealth.fromJson(namespace, service, info.health, {
+          rateInterval: rateInterval || 600,
+          hasSidecar: info.istioSidecar
+        });
+      }
+      return info;
     }
-    return info;
-  });
+  );
 };
 
 export const getWorkloads = (
   namespace: string,
   params: { [key: string]: string } = {},
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ) => {
-  return newRequest<WorkloadNamespaceResponse>(
-    HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.workloads(namespace),
-    params,
-    {}
-  );
+  return newRequest<WorkloadNamespaceResponse>(HTTP_VERBS.GET, proxyUrl, urls.workloads(namespace), params, {});
 };
 
 export const getWorkload = (
   namespace: string,
   name: string,
   params?: { [key: string]: string },
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ) => {
-  return newRequest<Workload>(
-    HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.workload(namespace, name),
-    params,
-    {}
-  );
+  return newRequest<Workload>(HTTP_VERBS.GET, proxyUrl, urls.workload(namespace, name), params, {});
 };
 
 export const updateWorkload = (
@@ -743,19 +626,14 @@ export const updateWorkload = (
   type: string,
   jsonPatch: string,
   patchType?: string,
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ): Promise<Response<string>> => {
   const params: any = {};
   params.type = type;
   if (patchType) {
     params.patchType = patchType;
   }
-  return newRequest(
-    HTTP_VERBS.PATCH,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.workload(namespace, name),
-    params,
-    jsonPatch
-  );
+  return newRequest(HTTP_VERBS.PATCH, proxyUrl, urls.workload(namespace, name), params, jsonPatch);
 };
 
 export const updateService = (
@@ -763,22 +641,17 @@ export const updateService = (
   name: string,
   jsonPatch: string,
   patchType?: string,
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ): Promise<Response<string>> => {
   const params: any = {};
   if (patchType) {
     params.patchType = patchType;
   }
-  return newRequest(
-    HTTP_VERBS.PATCH,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.service(namespace, name),
-    params,
-    jsonPatch
-  );
+  return newRequest(HTTP_VERBS.PATCH, proxyUrl, urls.service(namespace, name), params, jsonPatch);
 };
 
-export const getPod = (namespace: string, name: string, kialiUrl: string | null = null) => {
-  return newRequest<Pod>(HTTP_VERBS.GET, (kialiUrl ? kialiUrl + '/' : '') + urls.pod(namespace, name), {}, {});
+export const getPod = (namespace: string, name: string, proxyUrl: string | null = null) => {
+  return newRequest<Pod>(HTTP_VERBS.GET, proxyUrl, urls.pod(namespace, name), {}, {});
 };
 
 export const getPodLogs = (
@@ -789,7 +662,7 @@ export const getPodLogs = (
   sinceTime?: number,
   duration?: DurationInSeconds,
   isProxy?: boolean,
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ) => {
   const params: any = {};
   if (container) {
@@ -806,49 +679,35 @@ export const getPodLogs = (
   }
   params.isProxy = !!isProxy;
 
-  return newRequest<PodLogs>(
-    HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.podLogs(namespace, name),
-    params,
-    {}
-  );
+  return newRequest<PodLogs>(HTTP_VERBS.GET, proxyUrl, urls.podLogs(namespace, name), params, {});
 };
 
 export const setPodEnvoyProxyLogLevel = (
   namespace: string,
   name: string,
   level: string,
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ) => {
   const params: any = {};
   params.level = level;
 
-  return newRequest<undefined>(
-    HTTP_VERBS.POST,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.podEnvoyProxyLogging(namespace, name),
-    params,
-    {}
-  );
+  return newRequest<undefined>(HTTP_VERBS.POST, proxyUrl, urls.podEnvoyProxyLogging(namespace, name), params, {});
 };
 
-export const getPodEnvoyProxy = (namespace: string, pod: string, kialiUrl: string | null = null) => {
-  return newRequest<EnvoyProxyDump>(
-    HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.podEnvoyProxy(namespace, pod),
-    {},
-    {}
-  );
+export const getPodEnvoyProxy = (namespace: string, pod: string, proxyUrl: string | null = null) => {
+  return newRequest<EnvoyProxyDump>(HTTP_VERBS.GET, proxyUrl, urls.podEnvoyProxy(namespace, pod), {}, {});
 };
 
 export const getPodEnvoyProxyResourceEntries = (
   namespace: string,
   pod: string,
   resource: string,
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ) => {
   return newRequest<EnvoyProxyDump>(
     HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.podEnvoyProxyResourceEntries(namespace, pod, resource),
+    proxyUrl,
+    urls.podEnvoyProxyResourceEntries(namespace, pod, resource),
     {},
     {}
   );
@@ -879,77 +738,58 @@ export const getErrorDetail = (error: AxiosError): string => {
   return '';
 };
 
-export const getAppSpans = (namespace: string, app: string, params: TracingQuery, kialiUrl: string | null = null) => {
-  return newRequest<TracingSpan[]>(
-    HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.appSpans(namespace, app),
-    params,
-    {}
-  );
+export const getAppSpans = (namespace: string, app: string, params: TracingQuery, proxyUrl: string | null = null) => {
+  return newRequest<TracingSpan[]>(HTTP_VERBS.GET, proxyUrl, urls.appSpans(namespace, app), params, {});
 };
 
 export const getServiceSpans = (
   namespace: string,
   service: string,
   params: TracingQuery,
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ) => {
-  return newRequest<TracingSpan[]>(
-    HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.serviceSpans(namespace, service),
-    params,
-    {}
-  );
+  return newRequest<TracingSpan[]>(HTTP_VERBS.GET, proxyUrl, urls.serviceSpans(namespace, service), params, {});
 };
 
 export const getWorkloadSpans = (
   namespace: string,
   workload: string,
   params: TracingQuery,
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ) => {
-  return newRequest<TracingSpan[]>(
-    HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.workloadSpans(namespace, workload),
-    params,
-    {}
-  );
+  return newRequest<TracingSpan[]>(HTTP_VERBS.GET, proxyUrl, urls.workloadSpans(namespace, workload), params, {});
 };
 
-export const getIstioPermissions = (namespaces: string[], kialiUrl: string | null = null) => {
+export const getIstioPermissions = (namespaces: string[], proxyUrl: string | null = null) => {
   return newRequest<IstioPermissions>(
     HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.istioPermissions,
+    proxyUrl,
+    urls.istioPermissions,
     { namespaces: namespaces.join(',') },
     {}
   );
 };
 
-export const getMetricsStats = (queries: MetricsStatsQuery[], kialiUrl: string | null = null) => {
-  return newRequest<MetricsStatsResult>(
-    HTTP_VERBS.POST,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.metricsStats,
-    {},
-    { queries: queries }
-  );
+export const getMetricsStats = (queries: MetricsStatsQuery[], proxyUrl: string | null = null) => {
+  return newRequest<MetricsStatsResult>(HTTP_VERBS.POST, proxyUrl, urls.metricsStats, {}, { queries: queries });
 };
 
-export const getClusters = (kialiUrl: string | null = null) => {
-  return newRequest<MeshClusters>(HTTP_VERBS.GET, (kialiUrl ? kialiUrl + '/' : '') + urls.clusters, {}, {});
+export const getClusters = (proxyUrl: string | null = null) => {
+  return newRequest<MeshClusters>(HTTP_VERBS.GET, proxyUrl, urls.clusters, {}, {});
 };
 
 export function deleteServiceTrafficRouting(
   virtualServices: VirtualService[],
   destinationRules: DestinationRuleC[],
   k8sHTTPRouteList: K8sHTTPRoute[],
-  kialiUrl: string | null
+  proxyUrl: string | null
 ): Promise<any>;
 export function deleteServiceTrafficRouting(serviceDetail: ServiceDetailsInfo): Promise<any>;
 export function deleteServiceTrafficRouting(
   vsOrSvc: VirtualService[] | ServiceDetailsInfo,
   destinationRules?: DestinationRuleC[],
   k8sHTTPRouteList?: K8sHTTPRoute[],
-  kialiUrl: string | null = null
+  proxyUrl: string | null = null
 ): Promise<any> {
   let vsList: VirtualService[];
   let drList: DestinationRuleC[];
@@ -968,25 +808,25 @@ export function deleteServiceTrafficRouting(
 
   vsList.forEach(vs => {
     deletePromises.push(
-      deleteIstioConfigDetail(vs.metadata.namespace || '', 'virtualservices', vs.metadata.name, kialiUrl)
+      deleteIstioConfigDetail(vs.metadata.namespace || '', 'virtualservices', vs.metadata.name, proxyUrl)
     );
   });
 
   routeList.forEach(k8sr => {
     deletePromises.push(
-      deleteIstioConfigDetail(k8sr.metadata.namespace || '', 'k8shttproutes', k8sr.metadata.name, kialiUrl)
+      deleteIstioConfigDetail(k8sr.metadata.namespace || '', 'k8shttproutes', k8sr.metadata.name, proxyUrl)
     );
   });
 
   drList.forEach(dr => {
     deletePromises.push(
-      deleteIstioConfigDetail(dr.metadata.namespace || '', 'destinationrules', dr.metadata.name, kialiUrl)
+      deleteIstioConfigDetail(dr.metadata.namespace || '', 'destinationrules', dr.metadata.name, proxyUrl)
     );
 
     const paName = dr.hasPeerAuthentication();
     if (paName) {
       deletePromises.push(
-        deleteIstioConfigDetail(dr.metadata.namespace || '', 'peerauthentications', paName, kialiUrl)
+        deleteIstioConfigDetail(dr.metadata.namespace || '', 'peerauthentications', paName, proxyUrl)
       );
     }
   });
@@ -994,20 +834,10 @@ export function deleteServiceTrafficRouting(
   return Promise.all(deletePromises);
 }
 
-export const getCrippledFeatures = (kialiUrl: string | null = null): Promise<Response<KialiCrippledFeatures>> => {
-  return newRequest<KialiCrippledFeatures>(
-    HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.crippledFeatures,
-    {},
-    {}
-  );
+export const getCrippledFeatures = (proxyUrl: string | null = null): Promise<Response<KialiCrippledFeatures>> => {
+  return newRequest<KialiCrippledFeatures>(HTTP_VERBS.GET, proxyUrl, urls.crippledFeatures, {}, {});
 };
 
-export const getCanaryUpgradeStatus = (kialiUrl: string | null = null) => {
-  return newRequest<CanaryUpgradeStatus>(
-    HTTP_VERBS.GET,
-    (kialiUrl ? kialiUrl + '/' : '') + urls.canaryUpgradeStatus(),
-    {},
-    {}
-  );
+export const getCanaryUpgradeStatus = (proxyUrl: string | null = null) => {
+  return newRequest<CanaryUpgradeStatus>(HTTP_VERBS.GET, proxyUrl, urls.canaryUpgradeStatus(), {}, {});
 };
