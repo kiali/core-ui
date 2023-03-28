@@ -22,7 +22,6 @@ const validationStyle = style({
 
 export type ValidationProps = ValidationDescription & {
   messageColor?: boolean;
-  size?: string;
   textStyle?: React.CSSProperties;
   iconStyle?: React.CSSProperties;
 };
