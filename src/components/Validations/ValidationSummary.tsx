@@ -1,5 +1,4 @@
-import * as React from 'react';
-import { CSSProperties } from 'react';
+import React from 'react';
 import { StatusCondition, ValidationTypes } from '../../types/IstioObjects';
 import { style } from 'typestyle';
 import { Text, TextVariants, Tooltip, TooltipPosition } from '@patternfly/react-core';
@@ -11,7 +10,7 @@ interface ValidationSummaryProps {
   errors: number;
   warnings: number;
   objectCount?: number;
-  style?: CSSProperties;
+  style?: React.CSSProperties;
 }
 
 const tooltipListStyle = style({
@@ -121,5 +120,3 @@ export const ValidationSummary = (props: ValidationSummaryProps) => {
     </Tooltip>
   );
 };
-
-export default ValidationSummary;

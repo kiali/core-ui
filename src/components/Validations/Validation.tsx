@@ -20,18 +20,18 @@ const validationStyle = style({
   }
 });
 
-export type ValidationProps = ValidationDescription & {
+type ValidationProps = ValidationDescription & {
   messageColor?: boolean;
   textStyle?: React.CSSProperties;
   iconStyle?: React.CSSProperties;
 };
 
-export type ValidationDescription = {
+type ValidationDescription = {
   severity: ValidationTypes;
   message?: string;
 };
 
-export type ValidationType = {
+type ValidationType = {
   name: string;
   color: string;
   icon: React.ComponentClass<SVGIconProps>;
@@ -61,7 +61,7 @@ const CorrectValidation: ValidationType = {
   icon: CheckCircleIcon
 };
 
-export const severityToValidation: { [severity: string]: ValidationType } = {
+const severityToValidation: { [severity: string]: ValidationType } = {
   error: ErrorValidation,
   warning: WarningValidation,
   correct: CorrectValidation,

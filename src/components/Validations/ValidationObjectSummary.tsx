@@ -1,13 +1,12 @@
 import React from 'react';
 import { ObjectValidation, StatusCondition, ValidationTypes } from '../../types/IstioObjects';
-import ValidationSummary from './ValidationSummary';
-import { CSSProperties } from 'react';
+import { ValidationSummary } from './ValidationSummary';
 
 interface ValidationObjectSummaryProps {
   id: string;
   validations: ObjectValidation[];
   reconciledCondition?: StatusCondition;
-  style?: CSSProperties;
+  style?: React.CSSProperties;
 }
 
 export const ValidationObjectSummary = (props: ValidationObjectSummaryProps) => {
