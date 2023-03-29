@@ -106,3 +106,9 @@ export const generateKey = (metrics: Metric[], chartName: string): string => {
 
   return chartName + '-' + labelNames.join('-');
 };
+
+export const toLocaleStringWithConditionalDate = (dat: Date): string => {
+  const nowDate = new Date().toLocaleDateString();
+  const thisDate = dat.toLocaleDateString();
+  return nowDate === thisDate ? dat.toLocaleTimeString() : dat.toLocaleString();
+};

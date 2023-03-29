@@ -1,17 +1,9 @@
-import React from 'react';
-import { StatusCondition, ValidationTypes } from '../../types/IstioObjects';
+import * as React from 'react';
+import { ValidationTypes } from '../../types/IstioObjects';
 import { style } from 'typestyle';
 import { Text, TextVariants, Tooltip, TooltipPosition } from '@patternfly/react-core';
 import { Validation } from './Validation';
-
-interface ValidationSummaryProps {
-  id: string;
-  reconciledCondition?: StatusCondition;
-  errors: number;
-  warnings: number;
-  objectCount?: number;
-  style?: React.CSSProperties;
-}
+import { severitySummary, ValidationSummaryProps } from './Helper';
 
 const tooltipListStyle = style({
   textAlign: 'left',
@@ -28,28 +20,6 @@ const tooltipSentenceStyle = style({
 });
 
 export const ValidationSummary = (props: ValidationSummaryProps) => {
-  const getTypeMessage = (count: number, type: ValidationTypes): string => {
-    return count > 1 ? `${count} ${type}s found` : `${count} ${type} found`;
-  };
-
-  const severitySummary = () => {
-    const issuesMessages: string[] = [];
-
-    if (props.errors > 0) {
-      issuesMessages.push(getTypeMessage(props.errors, ValidationTypes.Error));
-    }
-
-    if (props.warnings > 0) {
-      issuesMessages.push(getTypeMessage(props.warnings, ValidationTypes.Warning));
-    }
-
-    if (issuesMessages.length === 0) {
-      issuesMessages.push('No issues found');
-    }
-
-    return issuesMessages;
-  };
-
   const severity = () => {
     let severity = ValidationTypes.Correct;
     if (props.errors > 0) {
@@ -76,7 +46,7 @@ export const ValidationSummary = (props: ValidationSummaryProps) => {
           Istio config objects analyzed: {props.objectCount}
         </Text>
         <div className={tooltipListStyle}>
-          {severitySummary().map(cat => (
+          {severitySummary(props.warnings, props.errors).map(cat => (
             <div key={cat}>{cat}</div>
           ))}
         </div>

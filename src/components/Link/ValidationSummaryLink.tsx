@@ -1,0 +1,40 @@
+import * as React from 'react';
+import IstioConfigListLink from './IstioConfigListLink';
+
+type Props = {
+  namespace: string;
+  errors: number;
+  warnings: number;
+  objectCount?: number;
+  children: React.ReactNode;
+  link?: string;
+};
+
+class ValidationSummaryLink extends React.Component<Props> {
+  hasIstioObjects = () => {
+    return this.props.objectCount && this.props.objectCount > 0;
+  };
+
+  render() {
+    let link: any = <div style={{ display: 'inline-block', marginLeft: '5px' }}>N/A</div>;
+
+    if (this.hasIstioObjects()) {
+      // Kiosk actions are used when the kiosk specifies a parent,
+      // otherwise the kiosk=true will keep the links inside Kiali
+      link = (
+        <IstioConfigListLink
+          namespaces={[this.props.namespace]}
+          warnings={this.props.warnings > 0}
+          errors={this.props.errors > 0}
+          link={this.props.link}
+        >
+          {this.props.children}
+        </IstioConfigListLink>
+      );
+    }
+
+    return link;
+  }
+}
+
+export default ValidationSummaryLink;

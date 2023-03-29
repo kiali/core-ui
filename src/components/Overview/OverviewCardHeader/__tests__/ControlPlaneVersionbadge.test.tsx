@@ -4,7 +4,7 @@ import enzyme from 'enzyme';
 
 const { shallow } = enzyme;
 
-import { ControlPlaneVersionBadge } from '../ControlPlaneVersionbadge';
+import { ControlPlaneVersionBadge } from '../ControlPlaneVersionBadge';
 
 const mockControlPlaneVersionBadge = (version: string = '1.0', canary: boolean = true) => {
   return <ControlPlaneVersionBadge version={version} isCanary={canary} />;

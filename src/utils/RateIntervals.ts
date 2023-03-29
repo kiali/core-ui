@@ -1,6 +1,6 @@
 import { config } from '../config/Config';
-import { IntervalInMilliseconds } from '../types/Common';
 import { ComputedServerConfig } from '../config/ServerConfig';
+import { IntervalInMilliseconds } from '../types/Common';
 
 export const getName = (serverConfig: ComputedServerConfig, durationSeconds: number): string => {
   const name = serverConfig.durations[durationSeconds];
