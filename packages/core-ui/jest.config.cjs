@@ -12,7 +12,6 @@ module.exports = {
   coverageDirectory: '.coverage',
   testEnvironment: 'jsdom',
   setupFilesAfterEnv: ['@testing-library/jest-dom/extend-expect'],
-  setupFiles: ['./setupTests.ts'],
   transform: {
     '^.+\\.(ts|tsx|js|jsx)$': [
       'ts-jest',
