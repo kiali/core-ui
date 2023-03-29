@@ -72,7 +72,7 @@ describe('ValidationSummary', () => {
 
   test('Renders with no object counts', async () => {
     const { container, getByText, getByRole } = render(mockValidationSummary(0, 0, 0));
-    expect(getByText('N/A')).toBeInTheDocument();
+    expect(getByText('N/A')).toBeVisible();
     // No validation icon on the screen
     expect(container.querySelector('svg')).not.toBeInTheDocument();
     userEvent.hover(getByText('N/A'));
