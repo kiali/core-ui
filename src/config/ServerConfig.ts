@@ -34,7 +34,7 @@ const durationsTuples: [number, string][] = [
   [2592000, '30d']
 ];
 
-const computeValidDurations = (cfg: ComputedServerConfig) => {
+export const computeValidDurations = (cfg: ComputedServerConfig) => {
   const tsdbRetention = cfg.prometheus.storageTsdbRetention;
   const scrapeInterval = cfg.prometheus.globalScrapeInterval;
   let filtered = durationsTuples.filter(
@@ -49,7 +49,7 @@ const computeValidDurations = (cfg: ComputedServerConfig) => {
 
 // Set some reasonable defaults. Initial values should be valid for fields
 // than may not be providedby/set on the server.
-const defaultServerConfig: ComputedServerConfig = {
+export const defaultServerConfig: ComputedServerConfig = {
   accessibleNamespaces: [],
   authStrategy: '',
   clusters: {},
@@ -109,27 +109,7 @@ const defaultServerConfig: ComputedServerConfig = {
   }
 };
 
-// Overwritten with real server config on user login. Also used for tests.
-let serverConfig = defaultServerConfig;
-computeValidDurations(serverConfig);
-export { serverConfig };
-
-export const toValidDuration = (duration: number): number => {
-  // Check if valid
-  if (serverConfig.durations[duration]) {
-    return duration;
-  }
-  // Get closest duration
-  const validDurations = durationsTuples.filter(d => serverConfig.durations[d[0]]);
-  for (let i = validDurations.length - 1; i > 0; i--) {
-    if (duration > durationsTuples[i][0]) {
-      return validDurations[i][0];
-    }
-  }
-  return validDurations[0][0];
-};
-
-export const setServerConfig = (cfg: ServerConfig) => {
+export const setServerConfig = (serverConfig: ComputedServerConfig, cfg: ServerConfig) => {
   serverConfig = {
     ...defaultServerConfig,
     ...cfg
@@ -137,9 +117,11 @@ export const setServerConfig = (cfg: ServerConfig) => {
 
   serverConfig.healthConfig = cfg.healthConfig ? parseHealthConfig(cfg.healthConfig) : serverConfig.healthConfig;
   computeValidDurations(serverConfig);
+
+  return serverConfig;
 };
 
-export const isIstioNamespace = (namespace: string): boolean => {
+export const isIstioNamespace = (serverConfig: ComputedServerConfig, namespace: string): boolean => {
   if (namespace === serverConfig.istioNamespace) {
     return true;
   }

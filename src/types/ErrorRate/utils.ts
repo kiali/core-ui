@@ -9,7 +9,7 @@ import {
   Responses,
   ToleranceConfig
 } from '../';
-import { serverConfig } from '../../config/';
+import { ComputedServerConfig } from '../../config/';
 import { Rate, RequestTolerance } from './types';
 import { generateRateForTolerance } from './ErrorRate';
 import { generateRateForGraphTolerance } from './GraphEdgeStatus';
@@ -63,7 +63,12 @@ export const checkExpr = (value: RegexConfig | undefined, testV: string): boolea
 // Cache the configuration to avoid multiple calls to regExp
 export let configCache: { [key: string]: RateHealthConfig } = {};
 
-export const getRateHealthConfig = (ns: string, name: string, kind: string): RateHealthConfig => {
+export const getRateHealthConfig = (
+  serverConfig: ComputedServerConfig,
+  ns: string,
+  name: string,
+  kind: string
+): RateHealthConfig => {
   const key = ns + '_' + kind + '_' + name;
   // If we have the configuration cached then return it
   if (configCache[key]) {

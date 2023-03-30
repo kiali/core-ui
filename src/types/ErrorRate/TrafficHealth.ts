@@ -1,4 +1,5 @@
 import { Direction, NodeType, ProtocolWithTraffic, RateHealth, ThresholdStatus } from '../';
+import { ComputedServerConfig } from '../../config';
 import { aggregate, checkExpr, getRateHealthConfig, transformEdgeResponses } from './utils';
 import { calculateStatusGraph } from './GraphEdgeStatus';
 import { TrafficItem } from '../';
@@ -6,7 +7,11 @@ import { TrafficItem } from '../';
 /*
  Calculate Health for DetailsTraffic
 */
-export const getTrafficHealth = (item: TrafficItem, direction: Direction): ThresholdStatus => {
+export const getTrafficHealth = (
+  serverConfig: ComputedServerConfig,
+  item: TrafficItem,
+  direction: Direction
+): ThresholdStatus => {
   // Get the annotation configuration
   const annotation =
     item.node.type !== NodeType.APP && item.node.healthAnnotation
@@ -16,7 +21,7 @@ export const getTrafficHealth = (item: TrafficItem, direction: Direction): Thres
   const config =
     annotation && annotation.toleranceConfig
       ? annotation.toleranceConfig
-      : getRateHealthConfig(item.node.namespace, item.node.name, item.node.type).tolerance;
+      : getRateHealthConfig(serverConfig, item.node.namespace, item.node.name, item.node.type).tolerance;
 
   // Get tolerances of the configuration for the direction provided
   const tolerances = config.filter(tol => checkExpr(tol.direction, direction));

@@ -10,6 +10,7 @@ import {
   ToleranceConfig
 } from '../';
 import { checkExpr, emptyRate, getRateHealthConfig, getErrorCodeRate } from './utils';
+import { ComputedServerConfig } from '../../config';
 import { ErrorRatio, Rate, RequestTolerance } from './types';
 
 // Sum the inbound and outbound request for calculating the global status
@@ -53,6 +54,7 @@ const getAggregate = (
 };
 
 export const calculateErrorRate = (
+  serverConfig: ComputedServerConfig,
   ns: string,
   name: string,
   kind: string,
@@ -60,7 +62,7 @@ export const calculateErrorRate = (
 ): { errorRatio: ErrorRatio; config: ToleranceConfig[] } => {
   // Get the first configuration that match with the case
   const rateAnnotation = new RateHealth(requests.healthAnnotations);
-  const conf = rateAnnotation.toleranceConfig || getRateHealthConfig(ns, name, kind).tolerance;
+  const conf = rateAnnotation.toleranceConfig || getRateHealthConfig(serverConfig, ns, name, kind).tolerance;
 
   // Get aggregate
   let status = getAggregate(requests, conf);
