@@ -1,6 +1,6 @@
 /* eslint-disable no-redeclare */
 import axios, { AxiosError } from 'axios';
-import { config } from '../config';
+import { ComputedServerConfig, config } from '../config';
 import { LoginSession } from '../store/Store';
 import { App } from '../types/App';
 import { AppList } from '../types/AppList';
@@ -376,6 +376,7 @@ export const getCustomDashboard = (ns: string, tpl: string, params: DashboardQue
 };
 
 export const getNamespaceAppHealth = (
+  serverConfig: ComputedServerConfig,
   namespace: string,
   duration: DurationInSeconds,
   queryTime?: TimeInSeconds,
@@ -394,7 +395,10 @@ export const getNamespaceAppHealth = (
     response => {
       const ret: NamespaceAppHealth = {};
       Object.keys(response.data).forEach(k => {
-        ret[k] = AppHealth.fromJson(namespace, k, response.data[k], { rateInterval: duration, hasSidecar: true });
+        ret[k] = AppHealth.fromJson(serverConfig, namespace, k, response.data[k], {
+          rateInterval: duration,
+          hasSidecar: true
+        });
       });
       return ret;
     }
@@ -402,6 +406,7 @@ export const getNamespaceAppHealth = (
 };
 
 export const getNamespaceServiceHealth = (
+  serverConfig: ComputedServerConfig,
   namespace: string,
   duration: DurationInSeconds,
   queryTime?: TimeInSeconds,
@@ -420,7 +425,7 @@ export const getNamespaceServiceHealth = (
     response => {
       const ret: NamespaceServiceHealth = {};
       Object.keys(response.data).forEach(k => {
-        ret[k] = ServiceHealth.fromJson(namespace, k, response.data[k], {
+        ret[k] = ServiceHealth.fromJson(serverConfig, namespace, k, response.data[k], {
           rateInterval: duration,
           hasSidecar: true
         });
@@ -431,6 +436,7 @@ export const getNamespaceServiceHealth = (
 };
 
 export const getNamespaceWorkloadHealth = (
+  serverConfig: ComputedServerConfig,
   namespace: string,
   duration: DurationInSeconds,
   queryTime?: TimeInSeconds,
@@ -454,7 +460,7 @@ export const getNamespaceWorkloadHealth = (
   ).then(response => {
     const ret: NamespaceWorkloadHealth = {};
     Object.keys(response.data).forEach(k => {
-      ret[k] = WorkloadHealth.fromJson(namespace, k, response.data[k], {
+      ret[k] = WorkloadHealth.fromJson(serverConfig, namespace, k, response.data[k], {
         rateInterval: duration,
         hasSidecar: true
       });
@@ -575,6 +581,7 @@ export const getServerConfig = (proxyUrl: string | null = null) => {
 };
 
 export const getServiceDetail = (
+  serverConfig: ComputedServerConfig,
   namespace: string,
   service: string,
   validate: boolean,
@@ -593,7 +600,7 @@ export const getServiceDetail = (
       const info: ServiceDetailsInfo = r.data;
       if (info.health) {
         // Default rate interval in backend = 600s
-        info.health = ServiceHealth.fromJson(namespace, service, info.health, {
+        info.health = ServiceHealth.fromJson(serverConfig, namespace, service, info.health, {
           rateInterval: rateInterval || 600,
           hasSidecar: info.istioSidecar
         });

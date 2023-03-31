@@ -20,8 +20,9 @@ import {
 import { aggregate, checkExpr, getRateHealthConfig, transformEdgeResponses } from './utils';
 import { RequestTolerance } from './types';
 import { decoratedEdgeData, decoratedNodeData } from '../../utils';
+import { ComputedServerConfig } from '../../config';
 
-export const assignEdgeHealth = (cy: any) => {
+export const assignEdgeHealth = (serverConfig: ComputedServerConfig, cy: any) => {
   const cyGlobal = cy.scratch(CytoscapeGlobalScratchNamespace);
 
   cy.edges().forEach(ele => {
@@ -39,7 +40,7 @@ export const assignEdgeHealth = (cy: any) => {
 
     const sourceNodeData = decoratedNodeData(ele.source());
     const destNodeData = decoratedNodeData(ele.target());
-    const statusEdge = getEdgeHealth(edgeData, sourceNodeData, destNodeData);
+    const statusEdge = getEdgeHealth(serverConfig, edgeData, sourceNodeData, destNodeData);
 
     switch (statusEdge.status) {
       case FAILURE:
@@ -59,6 +60,7 @@ export const assignEdgeHealth = (cy: any) => {
  Return the status for the edge from source to target
 */
 const getEdgeHealth = (
+  serverConfig: ComputedServerConfig,
   edge: DecoratedGraphEdgeData,
   source: DecoratedGraphNodeData,
   target: DecoratedGraphNodeData
@@ -68,12 +70,12 @@ const getEdgeHealth = (
   const configSource =
     annotationSource && annotationSource.toleranceConfig
       ? annotationSource.toleranceConfig
-      : getRateHealthConfig(source.namespace, source[source.nodeType], source.nodeType).tolerance;
+      : getRateHealthConfig(serverConfig, source.namespace, source[source.nodeType], source.nodeType).tolerance;
   const annotationTarget = target.hasHealthConfig ? new RateHealth(target.hasHealthConfig) : undefined;
   const configTarget =
     annotationTarget && annotationTarget.toleranceConfig
       ? annotationTarget.toleranceConfig
-      : getRateHealthConfig(target.namespace, target[target.nodeType], target.nodeType).tolerance;
+      : getRateHealthConfig(serverConfig, target.namespace, target[target.nodeType], target.nodeType).tolerance;
 
   // If there is not tolerances with this configuration we'll use defaults
   const tolerancesSource = configSource.filter(tol => checkExpr(tol.direction, 'outbound'));

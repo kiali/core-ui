@@ -11,7 +11,7 @@ import { getName } from '../utils/';
 import { PFColors } from '../components/';
 import { calculateErrorRate } from './ErrorRate';
 import { HealthAnnotationType, ToleranceConfig } from './';
-import { serverConfig } from '../config/';
+import { ComputedServerConfig, defaultServerConfig } from '../config/';
 
 interface HealthConfig {
   items: HealthItem[];
@@ -285,7 +285,7 @@ export abstract class Health {
     return this.health.items.map(i => i.status).reduce((prev, cur) => mergeStatus(prev, cur), NA);
   }
 
-  getStatusConfig(): ToleranceConfig | undefined {
+  getStatusConfig(serverConfig: ComputedServerConfig): ToleranceConfig | undefined {
     // Check if the config applied is the kiali defaults one
     const tolConfDefault = serverConfig.healthConfig.rate[serverConfig.healthConfig.rate.length - 1].tolerance;
     for (let tol of tolConfDefault) {
@@ -326,21 +326,32 @@ interface HealthContext {
 }
 
 export class ServiceHealth extends Health {
-  public static fromJson = (ns: string, srv: string, json: any, ctx: HealthContext) =>
-    new ServiceHealth(ns, srv, json.requests, ctx);
+  public static fromJson = (
+    serverConfig: ComputedServerConfig,
+    ns: string,
+    srv: string,
+    json: any,
+    ctx: HealthContext
+  ) => new ServiceHealth(serverConfig, ns, srv, json.requests, ctx);
 
-  private static computeItems(ns: string, srv: string, requests: RequestHealth, ctx: HealthContext): HealthConfig {
+  private static computeItems(
+    serverConfig: ComputedServerConfig,
+    ns: string,
+    srv: string,
+    requests: RequestHealth,
+    ctx: HealthContext
+  ): HealthConfig {
     const items: HealthItem[] = [];
     let statusConfig: HealthItemConfig | undefined = undefined;
     if (ctx.hasSidecar) {
       // Request errors
-      const reqError = calculateErrorRate(ns, srv, 'service', requests);
+      const reqError = calculateErrorRate(serverConfig, ns, srv, 'service', requests);
       const reqErrorsText =
         reqError.errorRatio.global.status.status === NA
           ? 'No requests'
           : reqError.errorRatio.global.status.value.toFixed(2) + '%';
       const item: HealthItem = {
-        title: createTrafficTitle(getName(ctx.rateInterval).toLowerCase()),
+        title: createTrafficTitle(getName(serverConfig, ctx.rateInterval).toLowerCase()),
         status: reqError.errorRatio.global.status.status,
         children: [
           {
@@ -352,7 +363,7 @@ export class ServiceHealth extends Health {
       };
       items.push(item);
       statusConfig = {
-        title: createTrafficTitle(getName(ctx.rateInterval).toLowerCase()),
+        title: createTrafficTitle(getName(serverConfig, ctx.rateInterval).toLowerCase()),
         status: reqError.errorRatio.global.status.status,
         threshold: reqError.errorRatio.global.toleranceConfig,
         value: reqError.errorRatio.global.status.value
@@ -367,16 +378,28 @@ export class ServiceHealth extends Health {
     return { items, statusConfig };
   }
 
-  constructor(ns: string, srv: string, public requests: RequestHealth, ctx: HealthContext) {
-    super(ServiceHealth.computeItems(ns, srv, requests, ctx));
+  constructor(
+    serverConfig: ComputedServerConfig,
+    ns: string,
+    srv: string,
+    public requests: RequestHealth,
+    ctx: HealthContext
+  ) {
+    super(ServiceHealth.computeItems(serverConfig, ns, srv, requests, ctx));
   }
 }
 
 export class AppHealth extends Health {
-  public static fromJson = (ns: string, app: string, json: any, ctx: HealthContext) =>
-    new AppHealth(ns, app, json.workloadStatuses, json.requests, ctx);
+  public static fromJson = (
+    serverConfig: ComputedServerConfig,
+    ns: string,
+    app: string,
+    json: any,
+    ctx: HealthContext
+  ) => new AppHealth(serverConfig, ns, app, json.workloadStatuses, json.requests, ctx);
 
   private static computeItems(
+    serverConfig: ComputedServerConfig,
     ns: string,
     app: string,
     workloadStatuses: WorkloadStatus[],
@@ -409,17 +432,17 @@ export class AppHealth extends Health {
 
     // Request errors
     if (ctx.hasSidecar) {
-      const reqError = calculateErrorRate(ns, app, 'app', requests);
+      const reqError = calculateErrorRate(serverConfig, ns, app, 'app', requests);
       const reqIn = reqError.errorRatio.inbound.status;
       const reqOut = reqError.errorRatio.outbound.status;
       const both = mergeStatus(reqIn.status, reqOut.status);
       const item: HealthItem = {
-        title: createTrafficTitle(getName(ctx.rateInterval).toLowerCase()),
+        title: createTrafficTitle(getName(serverConfig, ctx.rateInterval).toLowerCase()),
         status: both,
         children: [getRequestErrorsSubItem(reqIn, 'Inbound'), getRequestErrorsSubItem(reqOut, 'Outbound')]
       };
       statusConfig = {
-        title: createTrafficTitle(getName(ctx.rateInterval).toLowerCase()),
+        title: createTrafficTitle(getName(serverConfig, ctx.rateInterval).toLowerCase()),
         status: reqError.errorRatio.global.status.status,
         threshold: reqError.errorRatio.global.toleranceConfig,
         value: reqError.errorRatio.global.status.value
@@ -430,21 +453,28 @@ export class AppHealth extends Health {
   }
 
   constructor(
+    serverConfig: ComputedServerConfig,
     ns: string,
     app: string,
     workloadStatuses: WorkloadStatus[],
     public requests: RequestHealth,
     ctx: HealthContext
   ) {
-    super(AppHealth.computeItems(ns, app, workloadStatuses, requests, ctx));
+    super(AppHealth.computeItems(serverConfig, ns, app, workloadStatuses, requests, ctx));
   }
 }
 
 export class WorkloadHealth extends Health {
-  public static fromJson = (ns: string, workload: string, json: any, ctx: HealthContext) =>
-    new WorkloadHealth(ns, workload, json.workloadStatus, json.requests, ctx);
+  public static fromJson = (
+    serverConfig: ComputedServerConfig,
+    ns: string,
+    workload: string,
+    json: any,
+    ctx: HealthContext
+  ) => new WorkloadHealth(serverConfig, ns, workload, json.workloadStatus, json.requests, ctx);
 
   private static computeItems(
+    serverConfig: ComputedServerConfig,
     ns: string,
     workload: string,
     workloadStatus: WorkloadStatus,
@@ -507,19 +537,19 @@ export class WorkloadHealth extends Health {
     }
     // Request errors
     if (ctx.hasSidecar) {
-      const reqError = calculateErrorRate(ns, workload, 'workload', requests);
+      const reqError = calculateErrorRate(serverConfig, ns, workload, 'workload', requests);
       const reqIn = reqError.errorRatio.inbound.status;
       const reqOut = reqError.errorRatio.outbound.status;
       const both = mergeStatus(reqIn.status, reqOut.status);
       const item: HealthItem = {
-        title: createTrafficTitle(getName(ctx.rateInterval).toLowerCase()),
+        title: createTrafficTitle(getName(serverConfig, ctx.rateInterval).toLowerCase()),
         status: both,
         children: [getRequestErrorsSubItem(reqIn, 'Inbound'), getRequestErrorsSubItem(reqOut, 'Outbound')]
       };
       items.push(item);
 
       statusConfig = {
-        title: createTrafficTitle(getName(ctx.rateInterval).toLowerCase()),
+        title: createTrafficTitle(getName(serverConfig, ctx.rateInterval).toLowerCase()),
         status: reqError.errorRatio.global.status.status,
         threshold: reqError.errorRatio.global.toleranceConfig,
         value: reqError.errorRatio.global.status.value
@@ -529,18 +559,20 @@ export class WorkloadHealth extends Health {
   }
 
   constructor(
+    serverConfig: ComputedServerConfig,
     ns: string,
     workload: string,
     workloadStatus: WorkloadStatus,
     public requests: RequestHealth,
     ctx: HealthContext
   ) {
-    super(WorkloadHealth.computeItems(ns, workload, workloadStatus, requests, ctx));
+    super(WorkloadHealth.computeItems(serverConfig, ns, workload, workloadStatus, requests, ctx));
   }
 }
 
 export const healthNotAvailable = (): AppHealth => {
   return new AppHealth(
+    defaultServerConfig,
     '',
     '',
     [],

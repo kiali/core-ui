@@ -27,3 +27,13 @@ export interface StatusState {
   warningMessages: string[];
   istioEnvironment: IstioEnvironment;
 }
+
+export const INITIAL_STATUS_STATE: StatusState = {
+  status: {},
+  externalServices: [],
+  warningMessages: [],
+  istioEnvironment: {
+    isMaistra: false,
+    istioAPIEnabled: true
+  }
+};
