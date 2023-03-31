@@ -4,7 +4,6 @@ import {
   RATIO_NA,
   HEALTHY,
   NA,
-  RequestType,
   FAILURE,
   DEGRADED,
   RateHealth,
@@ -95,29 +94,6 @@ const getEdgeHealth = (
     : inboundEdgeStatus.status;
 };
 
-/*
-  Calculate the RequestToleranceGraph for a requests and a configuration
-  Return the calculation in the object RequestToleranceGraph
-*/
-
-export const generateRateForGraphTolerance = (tol: RequestTolerance, requests: RequestType) => {
-  // If we have a tolerance configuration then calculate
-  if (tol.tolerance) {
-    // For each requests type {<protocol:string> : { <code: string>: <rate: number> } }
-    for (let [protocol, req] of Object.entries(requests)) {
-      // Check if protocol configuration match the protocol request
-      if (checkExpr(tol!.tolerance!.protocol, protocol)) {
-        // Loop by the status code and rate for each code
-        for (let [code, value] of Object.entries(req)) {
-          // If code match the regular expression in the configuration then sum the rate
-          if (checkExpr(tol!.tolerance!.code, code)) {
-            tol.requests[protocol] = tol.requests[protocol] ? (tol.requests[protocol] as number) + value : value;
-          }
-        }
-      }
-    }
-  }
-};
 /*
 Calculate the status of the edge with more priority given the results in requestsTolerances: RequestToleranceGraph[]
 

@@ -1,4 +1,4 @@
-import { ProxyStatus } from './Health';
+import { ProxyStatus } from './HealthStatus';
 import { TimeInSeconds } from './Common';
 import { KIALI_RELATED_LABEL, KIALI_WIZARD_LABEL } from './IstioWizards';
 import { PFColorVal } from '../components/';

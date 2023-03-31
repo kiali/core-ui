@@ -1,18 +1,9 @@
-import {
-  HealthAnnotationConfig,
-  HealthAnnotationType,
-  RateHealthConfig,
-  RegexConfig,
-  RequestHealth,
-  RequestType,
-  ResponseDetail,
-  Responses,
-  ToleranceConfig
-} from '../';
+import { HealthAnnotationConfig, HealthAnnotationType } from '../HealthAnnotation';
+import { RateHealthConfig, ToleranceConfig, RegexConfig } from '../ServerConfig';
+import { RequestHealth, RequestType } from '../HealthStatus';
+import { Responses, ResponseDetail } from '../Graph';
 import { ComputedServerConfig } from '../../config/';
 import { Rate, RequestTolerance } from './types';
-import { generateRateForTolerance } from './ErrorRate';
-import { generateRateForGraphTolerance } from './GraphEdgeStatus';
 
 export const emptyRate = (): Rate => {
   return { requestRate: 0, errorRate: 0, errorRatio: 0 };
@@ -132,4 +123,55 @@ export const aggregate = (
     }
   }
   return result;
+};
+
+export const generateRateForTolerance = (
+  tol: RequestTolerance,
+  requests: { [key: string]: { [key: string]: number } }
+) => {
+  for (let [protocol, req] of Object.entries(requests)) {
+    if (checkExpr(tol!.tolerance!.protocol, protocol)) {
+      for (let [code, value] of Object.entries(req)) {
+        if (!Object.keys(tol.requests).includes(protocol)) {
+          tol.requests[protocol] = emptyRate();
+        }
+        (tol.requests[protocol] as Rate).requestRate += Number(value);
+        if (checkExpr(tol!.tolerance!.code, code)) {
+          (tol.requests[protocol] as Rate).errorRate += Number(value);
+        }
+      }
+    }
+    if (Object.keys(tol.requests).includes(protocol)) {
+      if ((tol.requests[protocol] as Rate).requestRate === 0) {
+        (tol.requests[protocol] as Rate).errorRatio = -1;
+      } else {
+        (tol.requests[protocol] as Rate).errorRatio =
+          (tol.requests[protocol] as Rate).errorRate / (tol.requests[protocol] as Rate).requestRate;
+      }
+    }
+  }
+};
+
+/*
+  Calculate the RequestToleranceGraph for a requests and a configuration
+  Return the calculation in the object RequestToleranceGraph
+*/
+
+export const generateRateForGraphTolerance = (tol: RequestTolerance, requests: RequestType) => {
+  // If we have a tolerance configuration then calculate
+  if (tol.tolerance) {
+    // For each requests type {<protocol:string> : { <code: string>: <rate: number> } }
+    for (let [protocol, req] of Object.entries(requests)) {
+      // Check if protocol configuration match the protocol request
+      if (checkExpr(tol!.tolerance!.protocol, protocol)) {
+        // Loop by the status code and rate for each code
+        for (let [code, value] of Object.entries(req)) {
+          // If code match the regular expression in the configuration then sum the rate
+          if (checkExpr(tol!.tolerance!.code, code)) {
+            tol.requests[protocol] = tol.requests[protocol] ? (tol.requests[protocol] as number) + value : value;
+          }
+        }
+      }
+    }
+  }
 };
