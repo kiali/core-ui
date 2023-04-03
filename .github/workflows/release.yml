@@ -1,0 +1,59 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: Release type
+        required: true
+        default: "minor"
+        type: choice
+        options:
+        - major
+        - minor
+        - patch
+      release_branch:
+        description: Branch to release
+        required: true
+        default: master
+        type: string
+
+jobs:
+  initialize:
+    name: Initialize
+    runs-on: ubuntu-20.04
+    outputs:
+      release_type: ${{ env.release_type }}
+      release_branch: ${{ env.release_version }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.inputs.release_branch || github.ref_name }}
+
+    - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "14"
+          cache: yarn
+          cache-dependency-path: yarn.lock
+    - name: Major release
+      if: "${{ github.event.inputs.release_type == 'major' }}"
+      run: yarn version --major
+    - name: Minor release
+      if: "${{ github.event.inputs.release_type == 'minor' }}"
+      run: yarn version --minor
+    - name: Patch release
+      if: "${{ github.event.inputs.release_type == 'major' }}"
+      run: yarn version --patch
+
+    - name: Configure git
+      run: |
+        git config user.email 'kiali-dev@googlegroups.com'
+        git config user.name 'kiali-bot'
+    - name: Push changes
+      run: |
+        RELEASE_VERSION=$(cat package.json | jq -r '.version')
+        git add package.json
+        git commit -m "Release $RELEASE_VERSION"
+        git push origin 
