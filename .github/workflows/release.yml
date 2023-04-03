@@ -15,7 +15,7 @@ on:
       release_branch:
         description: Branch to release
         required: true
-        default: master
+        default: main
         type: string
 
 jobs:
@@ -30,7 +30,10 @@ jobs:
       uses: actions/checkout@v3
       with:
         ref: ${{ github.event.inputs.release_branch || github.ref_name }}
-
+    - name: Configure git
+      run: |
+        git config user.email 'kiali-dev@googlegroups.com'
+        git config user.name 'kiali-bot'
     - name: Setup node
       uses: actions/setup-node@v3
       with:
@@ -45,12 +48,7 @@ jobs:
       run: yarn version --minor
     - name: Patch release
       if: "${{ github.event.inputs.release_type == 'major' }}"
-      run: yarn version --patch
-
-    - name: Configure git
-      run: |
-        git config user.email 'kiali-dev@googlegroups.com'
-        git config user.name 'kiali-bot'
+      run: yarn version --patch    
     - name: Push changes
       run: |
         RELEASE_VERSION=$(cat package.json | jq -r '.version')
