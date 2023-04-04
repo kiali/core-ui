@@ -27,10 +27,10 @@ jobs:
       release_branch: ${{ env.release_version }}
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         ref: ${{ github.event.inputs.release_branch || github.ref_name }}
-        token: $${{ secrets.KIALI_PROJECT_TOKEN }}
+        token: ${{ secrets.KIALI_PROJECT_TOKEN || github.token }}
     - name: Configure git
       run: |
         git config user.email 'kialiProject@gmail.com'
