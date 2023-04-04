@@ -27,7 +27,7 @@ jobs:
       release_branch: ${{ env.release_version }}
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v2
       with:
         ref: ${{ github.event.inputs.release_branch || github.ref_name }}
         token: $${{ secrets.KIALI_PROJECT_TOKEN }}
