@@ -18,6 +18,10 @@ on:
         default: main
         type: string
 
+permissions:
+  actions: write
+  contents: write
+
 jobs:
   initialize:
     name: Initialize
@@ -52,7 +56,7 @@ jobs:
       run: yarn version --patch    
     - name: Push changes
       run: |
-        git push origin  
+        git push -f origin main 
     - run: npm publish
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}     
