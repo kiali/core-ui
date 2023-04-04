@@ -65,10 +65,12 @@ jobs:
         path-to-changelog: CHANGELOG.md
         version: ${{ env.NEW_VERSION }}
         operation: release          
-    - name: Publish package on NPM 📦
-      run: npm publish
+    - name: Publish package on Yarn 📦
+      run: |
+        echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+        yarn publish --no-verify-access
       env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}    
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     - name: Push changes
       run: |
         git add "package.json"
