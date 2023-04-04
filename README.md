@@ -1,6 +1,6 @@
 # Kiali Core
 
-[![Kiali Core badge](https://img.shields.io/npm/v/@kiali/core.svg?label=PF4%20Core&style=for-the-badge)](https://www.npmjs.com/package/@kiali/core)
+[![Kiali Core badge](https://img.shields.io/npm/v/@kiali/core-ui.svg?label=Kiali%20Core-ui&style=for-the-badge)](https://www.npmjs.com/package/@kiali/core-ui)
 
 ## Coverage Status
 
