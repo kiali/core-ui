@@ -721,8 +721,8 @@ export const getPodEnvoyProxyResourceEntries = (
 };
 
 export const getErrorString = (error: AxiosError): string => {
-  if (error && error.response) {
-    if (error.response.data && error.response.data.error) {
+  if (error?.response) {
+    if (error.response.data?.error) {
       return error.response.data.error;
     }
     if (error.response.statusText) {
@@ -737,10 +737,8 @@ export const getErrorString = (error: AxiosError): string => {
 };
 
 export const getErrorDetail = (error: AxiosError): string => {
-  if (error && error.response) {
-    if (error.response.data && error.response.data.detail) {
-      return error.response.data.detail;
-    }
+  if (error?.response?.data?.detail) {
+    return error.response.data.detail;
   }
   return '';
 };
