@@ -1,5 +1,5 @@
 /* eslint-disable no-redeclare */
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 import { ComputedServerConfig, config } from '../config';
 import { LoginSession } from '../store/Store';
 import { App } from '../types/App';
@@ -45,10 +45,6 @@ import { TLSStatus } from '../types/TLSStatus';
 import { Workload, WorkloadNamespaceResponse } from '../types/Workload';
 import { CertsInfo } from '../types/CertsInfo';
 export const ANONYMOUS_USER = 'anonymous';
-
-export interface Response<T> {
-  data: T;
-}
 
 /** API URLs */
 
@@ -105,7 +101,7 @@ export const extendSession = (proxyUrl: string | null = null) => {
 export const login = async (
   request: LoginRequest = { username: ANONYMOUS_USER, password: 'anonymous', token: '' },
   proxyUrl: string | null = null
-): Promise<Response<LoginSession>> => {
+): Promise<AxiosResponse<LoginSession>> => {
   const params = new URLSearchParams();
   params.append('token', request.token);
 
@@ -129,7 +125,7 @@ export const getAuthInfo = async (proxyUrl: string | null = null) => {
 export const checkOpenshiftAuth = async (
   data: any,
   proxyUrl: string | null = null
-): Promise<Response<LoginSession>> => {
+): Promise<AxiosResponse<LoginSession>> => {
   return newRequest<LoginSession>(HTTP_VERBS.POST, proxyUrl, urls.authenticate, {}, data);
 };
 
@@ -177,7 +173,7 @@ export const updateNamespace = (
   namespace: string,
   jsonPatch: string,
   proxyUrl: string | null = null
-): Promise<Response<string>> => {
+): Promise<AxiosResponse<string>> => {
   return newRequest(HTTP_VERBS.PATCH, proxyUrl, urls.namespace(namespace), {}, jsonPatch);
 };
 
@@ -188,7 +184,7 @@ export const getIstioConfig = (
   labelSelector: string,
   workloadSelector: string,
   proxyUrl: string | null = null
-): Promise<Response<IstioConfigList>> => {
+): Promise<AxiosResponse<IstioConfigList>> => {
   const params: any = objects && objects.length > 0 ? { objects: objects.join(',') } : {};
   if (validate) {
     params.validate = validate;
@@ -209,7 +205,7 @@ export const getAllIstioConfigs = (
   labelSelector: string,
   workloadSelector: string,
   proxyUrl: string | null = null
-): Promise<Response<IstioConfigsMap>> => {
+): Promise<AxiosResponse<IstioConfigsMap>> => {
   const params: any = namespaces && namespaces.length > 0 ? { namespaces: namespaces.join(',') } : {};
   if (objects && objects.length > 0) {
     params.objects = objects.join(',');
@@ -257,7 +253,7 @@ export const updateIstioConfigDetail = (
   object: string,
   jsonPatch: string,
   proxyUrl: string | null = null
-): Promise<Response<string>> => {
+): Promise<AxiosResponse<string>> => {
   return newRequest(HTTP_VERBS.PATCH, proxyUrl, urls.istioConfigDetail(namespace, objectType, object), {}, jsonPatch);
 };
 
@@ -266,7 +262,7 @@ export const createIstioConfigDetail = (
   objectType: string,
   json: string,
   proxyUrl: string | null = null
-): Promise<Response<string>> => {
+): Promise<AxiosResponse<string>> => {
   return newRequest(HTTP_VERBS.POST, proxyUrl, urls.istioConfigCreate(namespace, objectType), {}, json);
 };
 
@@ -634,7 +630,7 @@ export const updateWorkload = (
   jsonPatch: string,
   patchType?: string,
   proxyUrl: string | null = null
-): Promise<Response<string>> => {
+): Promise<AxiosResponse<string>> => {
   const params: any = {};
   params.type = type;
   if (patchType) {
@@ -649,7 +645,7 @@ export const updateService = (
   jsonPatch: string,
   patchType?: string,
   proxyUrl: string | null = null
-): Promise<Response<string>> => {
+): Promise<AxiosResponse<string>> => {
   const params: any = {};
   if (patchType) {
     params.patchType = patchType;
@@ -841,7 +837,7 @@ export function deleteServiceTrafficRouting(
   return Promise.all(deletePromises);
 }
 
-export const getCrippledFeatures = (proxyUrl: string | null = null): Promise<Response<KialiCrippledFeatures>> => {
+export const getCrippledFeatures = (proxyUrl: string | null = null): Promise<AxiosResponse<KialiCrippledFeatures>> => {
   return newRequest<KialiCrippledFeatures>(HTTP_VERBS.GET, proxyUrl, urls.crippledFeatures, {}, {});
 };
 
