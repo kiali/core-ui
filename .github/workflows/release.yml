@@ -71,21 +71,12 @@ jobs:
         yarn publish --no-verify-access
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-    - name: Push changes
+    - name: Push changes to repository
       run: |
         git add "package.json"
         git add "CHANGELOG.md"
         git commit -m "chore: release ${{ env.NEW_VERSION }}"
-        git tag ${{ env.NEW_VERSION }}
-    - name: Publish
-      run: |
-        echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-        yarn publish --verbose --access public --tag latest --no-verify-access
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}   
-    # Push repository changes
-    - name: Push changes to repository
-      run: |
+        git tag ${{ env.NEW_VERSION }}  
         git push origin && git push --tags
     # Read version changelog
     - id: get-changelog
