@@ -50,6 +50,10 @@ export interface Response<T> {
   data: T;
 }
 
+const getKialiProxy = (): string | null => {
+  return process.env.KIALI_PROXY ?? null;
+};
+
 /** API URLs */
 
 const urls = config.api.urls;
@@ -82,14 +86,17 @@ const basicAuth = (username: UserName, password: Password) => {
   return { username: username, password: password };
 };
 
-const newRequest = <P>(method: HTTP_VERBS, proxyUrl: string | null, url: string, queryParams: any, data: any) =>
-  axios.request<P>({
+const newRequest = <P>(method: HTTP_VERBS, url: string, queryParams: any, data: any) => {
+  const proxyUrl = getKialiProxy();
+
+  return axios.request<P>({
     method: method,
     url: (proxyUrl ? proxyUrl + '/' : '') + url,
     data: data,
     headers: getHeadersWithMethod(method, proxyUrl),
     params: queryParams
   });
+};
 
 interface LoginRequest {
   username: UserName;
@@ -98,16 +105,17 @@ interface LoginRequest {
 }
 
 /** Requests */
-export const extendSession = (proxyUrl: string | null = null) => {
-  return newRequest<LoginSession>(HTTP_VERBS.GET, proxyUrl, urls.authenticate, {}, {});
+export const extendSession = () => {
+  return newRequest<LoginSession>(HTTP_VERBS.GET, urls.authenticate, {}, {});
 };
 
 export const login = async (
-  request: LoginRequest = { username: ANONYMOUS_USER, password: 'anonymous', token: '' },
-  proxyUrl: string | null = null
+  request: LoginRequest = { username: ANONYMOUS_USER, password: 'anonymous', token: '' }
 ): Promise<Response<LoginSession>> => {
   const params = new URLSearchParams();
   params.append('token', request.token);
+
+  const proxyUrl = getKialiProxy();
 
   return axios({
     method: HTTP_VERBS.POST,
@@ -118,67 +126,60 @@ export const login = async (
   });
 };
 
-export const logout = (proxyUrl: string | null = null) => {
-  return newRequest<undefined>(HTTP_VERBS.GET, proxyUrl, urls.logout, {}, {});
+export const logout = () => {
+  return newRequest<undefined>(HTTP_VERBS.GET, urls.logout, {}, {});
 };
 
-export const getAuthInfo = async (proxyUrl: string | null = null) => {
-  return newRequest<AuthInfo>(HTTP_VERBS.GET, proxyUrl, urls.authInfo, {}, {});
+export const getAuthInfo = async () => {
+  return newRequest<AuthInfo>(HTTP_VERBS.GET, urls.authInfo, {}, {});
 };
 
-export const checkOpenshiftAuth = async (
-  data: any,
-  proxyUrl: string | null = null
-): Promise<Response<LoginSession>> => {
-  return newRequest<LoginSession>(HTTP_VERBS.POST, proxyUrl, urls.authenticate, {}, data);
+export const checkOpenshiftAuth = async (data: any): Promise<Response<LoginSession>> => {
+  return newRequest<LoginSession>(HTTP_VERBS.POST, urls.authenticate, {}, data);
 };
 
-export const getStatus = (proxyUrl: string | null = null) => {
-  return newRequest<StatusState>(HTTP_VERBS.GET, proxyUrl, urls.status, {}, {});
+export const getStatus = () => {
+  return newRequest<StatusState>(HTTP_VERBS.GET, urls.status, {}, {});
 };
 
-export const getNamespaces = (proxyUrl: string | null = null) => {
-  return newRequest<Namespace[]>(HTTP_VERBS.GET, proxyUrl, urls.namespaces, {}, {});
+export const getNamespaces = () => {
+  return newRequest<Namespace[]>(HTTP_VERBS.GET, urls.namespaces, {}, {});
 };
 
-export const getNamespaceMetrics = (namespace: string, params: IstioMetricsOptions, proxyUrl: string | null = null) => {
-  return newRequest<Readonly<IstioMetricsMap>>(HTTP_VERBS.GET, proxyUrl, urls.namespaceMetrics(namespace), params, {});
+export const getNamespaceMetrics = (namespace: string, params: IstioMetricsOptions) => {
+  return newRequest<Readonly<IstioMetricsMap>>(HTTP_VERBS.GET, urls.namespaceMetrics(namespace), params, {});
 };
 
-export const getMeshTls = (proxyUrl: string | null = null) => {
-  return newRequest<TLSStatus>(HTTP_VERBS.GET, proxyUrl, urls.meshTls(), {}, {});
+export const getMeshTls = () => {
+  return newRequest<TLSStatus>(HTTP_VERBS.GET, urls.meshTls(), {}, {});
 };
 
-export const getOutboundTrafficPolicyMode = (proxyUrl: string | null = null) => {
-  return newRequest<OutboundTrafficPolicy>(HTTP_VERBS.GET, proxyUrl, urls.outboundTrafficPolicyMode(), {}, {});
+export const getOutboundTrafficPolicyMode = () => {
+  return newRequest<OutboundTrafficPolicy>(HTTP_VERBS.GET, urls.outboundTrafficPolicyMode(), {}, {});
 };
 
-export const getIstioStatus = (proxyUrl: string | null = null) => {
-  return newRequest<ComponentStatus[]>(HTTP_VERBS.GET, proxyUrl, urls.istioStatus(), {}, {});
+export const getIstioStatus = () => {
+  return newRequest<ComponentStatus[]>(HTTP_VERBS.GET, urls.istioStatus(), {}, {});
 };
 
-export const getIstioCertsInfo = (proxyUrl: string | null = null) => {
-  return newRequest<CertsInfo[]>(HTTP_VERBS.GET, proxyUrl, urls.istioCertsInfo(), {}, {});
+export const getIstioCertsInfo = () => {
+  return newRequest<CertsInfo[]>(HTTP_VERBS.GET, urls.istioCertsInfo(), {}, {});
 };
 
-export const getIstiodResourceThresholds = (proxyUrl: string | null = null) => {
-  return newRequest<IstiodResourceThresholds>(HTTP_VERBS.GET, proxyUrl, urls.istiodResourceThresholds(), {}, {});
+export const getIstiodResourceThresholds = () => {
+  return newRequest<IstiodResourceThresholds>(HTTP_VERBS.GET, urls.istiodResourceThresholds(), {}, {});
 };
 
-export const getNamespaceTls = (namespace: string, proxyUrl: string | null = null) => {
-  return newRequest<TLSStatus>(HTTP_VERBS.GET, proxyUrl, urls.namespaceTls(namespace), {}, {});
+export const getNamespaceTls = (namespace: string) => {
+  return newRequest<TLSStatus>(HTTP_VERBS.GET, urls.namespaceTls(namespace), {}, {});
 };
 
-export const getNamespaceValidations = (namespace: string, proxyUrl: string | null = null) => {
-  return newRequest<ValidationStatus>(HTTP_VERBS.GET, proxyUrl, urls.namespaceValidations(namespace), {}, {});
+export const getNamespaceValidations = (namespace: string) => {
+  return newRequest<ValidationStatus>(HTTP_VERBS.GET, urls.namespaceValidations(namespace), {}, {});
 };
 
-export const updateNamespace = (
-  namespace: string,
-  jsonPatch: string,
-  proxyUrl: string | null = null
-): Promise<Response<string>> => {
-  return newRequest(HTTP_VERBS.PATCH, proxyUrl, urls.namespace(namespace), {}, jsonPatch);
+export const updateNamespace = (namespace: string, jsonPatch: string): Promise<Response<string>> => {
+  return newRequest(HTTP_VERBS.PATCH, urls.namespace(namespace), {}, jsonPatch);
 };
 
 export const getIstioConfig = (
@@ -186,8 +187,7 @@ export const getIstioConfig = (
   objects: string[],
   validate: boolean,
   labelSelector: string,
-  workloadSelector: string,
-  proxyUrl: string | null = null
+  workloadSelector: string
 ): Promise<Response<IstioConfigList>> => {
   const params: any = objects && objects.length > 0 ? { objects: objects.join(',') } : {};
   if (validate) {
@@ -199,7 +199,7 @@ export const getIstioConfig = (
   if (workloadSelector) {
     params.workloadSelector = workloadSelector;
   }
-  return newRequest<IstioConfigList>(HTTP_VERBS.GET, proxyUrl, urls.istioConfig(namespace), params, {});
+  return newRequest<IstioConfigList>(HTTP_VERBS.GET, urls.istioConfig(namespace), params, {});
 };
 
 export const getAllIstioConfigs = (
@@ -207,8 +207,7 @@ export const getAllIstioConfigs = (
   objects: string[],
   validate: boolean,
   labelSelector: string,
-  workloadSelector: string,
-  proxyUrl: string | null = null
+  workloadSelector: string
 ): Promise<Response<IstioConfigsMap>> => {
   const params: any = namespaces && namespaces.length > 0 ? { namespaces: namespaces.join(',') } : {};
   if (objects && objects.length > 0) {
@@ -223,164 +222,107 @@ export const getAllIstioConfigs = (
   if (workloadSelector) {
     params.workloadSelector = workloadSelector;
   }
-  return newRequest<IstioConfigsMap>(HTTP_VERBS.GET, proxyUrl, urls.allIstioConfigs(), params, {});
+  return newRequest<IstioConfigsMap>(HTTP_VERBS.GET, urls.allIstioConfigs(), params, {});
 };
 
-export const getIstioConfigDetail = (
-  namespace: string,
-  objectType: string,
-  object: string,
-  validate: boolean,
-  proxyUrl: string | null = null
-) => {
+export const getIstioConfigDetail = (namespace: string, objectType: string, object: string, validate: boolean) => {
   return newRequest<IstioConfigDetails>(
     HTTP_VERBS.GET,
-    proxyUrl,
     urls.istioConfigDetail(namespace, objectType, object),
     validate ? { validate: true, help: true } : {},
     {}
   );
 };
 
-export const deleteIstioConfigDetail = (
-  namespace: string,
-  objectType: string,
-  object: string,
-  proxyUrl: string | null = null
-) => {
-  return newRequest<string>(HTTP_VERBS.DELETE, proxyUrl, urls.istioConfigDetail(namespace, objectType, object), {}, {});
+export const deleteIstioConfigDetail = (namespace: string, objectType: string, object: string) => {
+  return newRequest<string>(HTTP_VERBS.DELETE, urls.istioConfigDetail(namespace, objectType, object), {}, {});
 };
 
 export const updateIstioConfigDetail = (
   namespace: string,
   objectType: string,
   object: string,
-  jsonPatch: string,
-  proxyUrl: string | null = null
+  jsonPatch: string
 ): Promise<Response<string>> => {
-  return newRequest(HTTP_VERBS.PATCH, proxyUrl, urls.istioConfigDetail(namespace, objectType, object), {}, jsonPatch);
+  return newRequest(HTTP_VERBS.PATCH, urls.istioConfigDetail(namespace, objectType, object), {}, jsonPatch);
 };
 
 export const createIstioConfigDetail = (
   namespace: string,
   objectType: string,
-  json: string,
-  proxyUrl: string | null = null
+  json: string
 ): Promise<Response<string>> => {
-  return newRequest(HTTP_VERBS.POST, proxyUrl, urls.istioConfigCreate(namespace, objectType), {}, json);
+  return newRequest(HTTP_VERBS.POST, urls.istioConfigCreate(namespace, objectType), {}, json);
 };
 
-export const getConfigValidations = (namespaces: string[], proxyUrl: string | null = null) => {
+export const getConfigValidations = (namespaces: string[]) => {
   return newRequest<ValidationStatus>(
     HTTP_VERBS.GET,
-    proxyUrl,
     urls.configValidations(),
     { namespaces: namespaces.join(',') },
     {}
   );
 };
 
-export const getServices = (
-  namespace: string,
-  params: { [key: string]: string } = {},
-  proxyUrl: string | null = null
-) => {
-  return newRequest<ServiceList>(HTTP_VERBS.GET, proxyUrl, urls.services(namespace), params, {});
+export const getServices = (namespace: string, params: { [key: string]: string } = {}) => {
+  return newRequest<ServiceList>(HTTP_VERBS.GET, urls.services(namespace), params, {});
 };
 
-export const getServiceMetrics = (
-  namespace: string,
-  service: string,
-  params: IstioMetricsOptions,
-  proxyUrl: string | null = null
-) => {
-  return newRequest<IstioMetricsMap>(HTTP_VERBS.GET, proxyUrl, urls.serviceMetrics(namespace, service), params, {});
+export const getServiceMetrics = (namespace: string, service: string, params: IstioMetricsOptions) => {
+  return newRequest<IstioMetricsMap>(HTTP_VERBS.GET, urls.serviceMetrics(namespace, service), params, {});
 };
 
-export const getServiceDashboard = (
-  namespace: string,
-  service: string,
-  params: IstioMetricsOptions,
-  proxyUrl: string | null = null
-) => {
-  return newRequest<DashboardModel>(HTTP_VERBS.GET, proxyUrl, urls.serviceDashboard(namespace, service), params, {});
+export const getServiceDashboard = (namespace: string, service: string, params: IstioMetricsOptions) => {
+  return newRequest<DashboardModel>(HTTP_VERBS.GET, urls.serviceDashboard(namespace, service), params, {});
 };
 
 export const getAggregateMetrics = (
   namespace: string,
   aggregate: string,
   aggregateValue: string,
-  params: IstioMetricsOptions,
-  proxyUrl: string | null = null
+  params: IstioMetricsOptions
 ) => {
   return newRequest<IstioMetricsMap>(
     HTTP_VERBS.GET,
-    proxyUrl,
     urls.aggregateMetrics(namespace, aggregate, aggregateValue),
     params,
     {}
   );
 };
 
-export const getApp = (
-  namespace: string,
-  app: string,
-  params?: { [key: string]: string },
-  proxyUrl: string | null = null
-) => {
-  return newRequest<App>(HTTP_VERBS.GET, proxyUrl, urls.app(namespace, app), params, {});
+export const getApp = (namespace: string, app: string, params?: { [key: string]: string }) => {
+  return newRequest<App>(HTTP_VERBS.GET, urls.app(namespace, app), params, {});
 };
 
-export const getApps = (namespace: string, params: any = {}, proxyUrl: string | null = null) => {
-  return newRequest<AppList>(HTTP_VERBS.GET, proxyUrl, urls.apps(namespace), params, {});
+export const getApps = (namespace: string, params: any = {}) => {
+  return newRequest<AppList>(HTTP_VERBS.GET, urls.apps(namespace), params, {});
 };
 
-export const getAppMetrics = (
-  namespace: string,
-  app: string,
-  params: IstioMetricsOptions,
-  proxyUrl: string | null = null
-) => {
-  return newRequest<IstioMetricsMap>(HTTP_VERBS.GET, proxyUrl, urls.appMetrics(namespace, app), params, {});
+export const getAppMetrics = (namespace: string, app: string, params: IstioMetricsOptions) => {
+  return newRequest<IstioMetricsMap>(HTTP_VERBS.GET, urls.appMetrics(namespace, app), params, {});
 };
 
-export const getAppDashboard = (
-  namespace: string,
-  app: string,
-  params: IstioMetricsOptions,
-  proxyUrl: string | null = null
-) => {
-  return newRequest<DashboardModel>(HTTP_VERBS.GET, proxyUrl, urls.appDashboard(namespace, app), params, {});
+export const getAppDashboard = (namespace: string, app: string, params: IstioMetricsOptions) => {
+  return newRequest<DashboardModel>(HTTP_VERBS.GET, urls.appDashboard(namespace, app), params, {});
 };
 
-export const getWorkloadMetrics = (
-  namespace: string,
-  workload: string,
-  params: IstioMetricsOptions,
-  proxyUrl: string | null = null
-) => {
-  return newRequest<IstioMetricsMap>(HTTP_VERBS.GET, proxyUrl, urls.workloadMetrics(namespace, workload), params, {});
+export const getWorkloadMetrics = (namespace: string, workload: string, params: IstioMetricsOptions) => {
+  return newRequest<IstioMetricsMap>(HTTP_VERBS.GET, urls.workloadMetrics(namespace, workload), params, {});
 };
 
-export const getWorkloadDashboard = (
-  namespace: string,
-  workload: string,
-  params: IstioMetricsOptions,
-  proxyUrl: string | null = null
-) => {
-  return newRequest<DashboardModel>(HTTP_VERBS.GET, proxyUrl, urls.workloadDashboard(namespace, workload), params, {});
+export const getWorkloadDashboard = (namespace: string, workload: string, params: IstioMetricsOptions) => {
+  return newRequest<DashboardModel>(HTTP_VERBS.GET, urls.workloadDashboard(namespace, workload), params, {});
 };
 
-export const getCustomDashboard = (ns: string, tpl: string, params: DashboardQuery, proxyUrl: string | null = null) => {
-  return newRequest<DashboardModel>(HTTP_VERBS.GET, proxyUrl, urls.customDashboard(ns, tpl), params, {});
+export const getCustomDashboard = (ns: string, tpl: string, params: DashboardQuery) => {
+  return newRequest<DashboardModel>(HTTP_VERBS.GET, urls.customDashboard(ns, tpl), params, {});
 };
 
 export const getNamespaceAppHealth = (
   serverConfig: ComputedServerConfig,
   namespace: string,
   duration: DurationInSeconds,
-  queryTime?: TimeInSeconds,
-  proxyUrl: string | null = null
+  queryTime?: TimeInSeconds
 ): Promise<NamespaceAppHealth> => {
   const params: any = {
     type: 'app'
@@ -391,26 +333,23 @@ export const getNamespaceAppHealth = (
   if (queryTime) {
     params.queryTime = String(queryTime);
   }
-  return newRequest<NamespaceAppHealth>(HTTP_VERBS.GET, proxyUrl, urls.namespaceHealth(namespace), params, {}).then(
-    response => {
-      const ret: NamespaceAppHealth = {};
-      Object.keys(response.data).forEach(k => {
-        ret[k] = AppHealth.fromJson(serverConfig, namespace, k, response.data[k], {
-          rateInterval: duration,
-          hasSidecar: true
-        });
+  return newRequest<NamespaceAppHealth>(HTTP_VERBS.GET, urls.namespaceHealth(namespace), params, {}).then(response => {
+    const ret: NamespaceAppHealth = {};
+    Object.keys(response.data).forEach(k => {
+      ret[k] = AppHealth.fromJson(serverConfig, namespace, k, response.data[k], {
+        rateInterval: duration,
+        hasSidecar: true
       });
-      return ret;
-    }
-  );
+    });
+    return ret;
+  });
 };
 
 export const getNamespaceServiceHealth = (
   serverConfig: ComputedServerConfig,
   namespace: string,
   duration: DurationInSeconds,
-  queryTime?: TimeInSeconds,
-  proxyUrl: string | null = null
+  queryTime?: TimeInSeconds
 ): Promise<NamespaceServiceHealth> => {
   const params: any = {
     type: 'service'
@@ -421,7 +360,7 @@ export const getNamespaceServiceHealth = (
   if (queryTime) {
     params.queryTime = String(queryTime);
   }
-  return newRequest<NamespaceServiceHealth>(HTTP_VERBS.GET, proxyUrl, urls.namespaceHealth(namespace), params, {}).then(
+  return newRequest<NamespaceServiceHealth>(HTTP_VERBS.GET, urls.namespaceHealth(namespace), params, {}).then(
     response => {
       const ret: NamespaceServiceHealth = {};
       Object.keys(response.data).forEach(k => {
@@ -439,8 +378,7 @@ export const getNamespaceWorkloadHealth = (
   serverConfig: ComputedServerConfig,
   namespace: string,
   duration: DurationInSeconds,
-  queryTime?: TimeInSeconds,
-  proxyUrl: string | null = null
+  queryTime?: TimeInSeconds
 ): Promise<NamespaceWorkloadHealth> => {
   const params: any = {
     type: 'workload'
@@ -451,91 +389,64 @@ export const getNamespaceWorkloadHealth = (
   if (queryTime) {
     params.queryTime = String(queryTime);
   }
-  return newRequest<NamespaceWorkloadHealth>(
-    HTTP_VERBS.GET,
-    proxyUrl,
-    urls.namespaceHealth(namespace),
-    params,
-    {}
-  ).then(response => {
-    const ret: NamespaceWorkloadHealth = {};
-    Object.keys(response.data).forEach(k => {
-      ret[k] = WorkloadHealth.fromJson(serverConfig, namespace, k, response.data[k], {
-        rateInterval: duration,
-        hasSidecar: true
+  return newRequest<NamespaceWorkloadHealth>(HTTP_VERBS.GET, urls.namespaceHealth(namespace), params, {}).then(
+    response => {
+      const ret: NamespaceWorkloadHealth = {};
+      Object.keys(response.data).forEach(k => {
+        ret[k] = WorkloadHealth.fromJson(serverConfig, namespace, k, response.data[k], {
+          rateInterval: duration,
+          hasSidecar: true
+        });
       });
-    });
-    return ret;
-  });
-};
-
-export const getGrafanaInfo = (proxyUrl: string | null = null) => {
-  return newRequest<GrafanaInfo>(HTTP_VERBS.GET, proxyUrl, urls.grafana, {}, {});
-};
-
-export const getJaegerInfo = (proxyUrl: string | null = null) => {
-  return newRequest<JaegerInfo>(HTTP_VERBS.GET, proxyUrl, urls.jaeger, {}, {});
-};
-
-export const getAppTraces = (namespace: string, app: string, params: TracingQuery, proxyUrl: string | null = null) => {
-  return newRequest<JaegerResponse>(HTTP_VERBS.GET, proxyUrl, urls.appTraces(namespace, app), params, {});
-};
-
-export const getServiceTraces = (
-  namespace: string,
-  service: string,
-  params: TracingQuery,
-  proxyUrl: string | null = null
-) => {
-  return newRequest<JaegerResponse>(HTTP_VERBS.GET, proxyUrl, urls.serviceTraces(namespace, service), params, {});
-};
-
-export const getWorkloadTraces = (
-  namespace: string,
-  workload: string,
-  params: TracingQuery,
-  proxyUrl: string | null = null
-) => {
-  return newRequest<JaegerResponse>(HTTP_VERBS.GET, proxyUrl, urls.workloadTraces(namespace, workload), params, {});
-};
-
-export const getJaegerErrorTraces = (
-  namespace: string,
-  service: string,
-  duration: DurationInSeconds,
-  proxyUrl: string | null = null
-) => {
-  return newRequest<number>(
-    HTTP_VERBS.GET,
-    proxyUrl,
-    urls.jaegerErrorTraces(namespace, service),
-    { duration: duration },
-    {}
+      return ret;
+    }
   );
 };
 
-export const getJaegerTrace = (idTrace: string, proxyUrl: string | null = null) => {
-  return newRequest<JaegerSingleResponse>(HTTP_VERBS.GET, proxyUrl, urls.jaegerTrace(idTrace), {}, {});
+export const getGrafanaInfo = () => {
+  return newRequest<GrafanaInfo>(HTTP_VERBS.GET, urls.grafana, {}, {});
 };
 
-export const getGraphElements = (params: any, proxyUrl: string | null = null) => {
-  return newRequest<GraphDefinition>(HTTP_VERBS.GET, proxyUrl, urls.namespacesGraphElements, params, {});
+export const getJaegerInfo = () => {
+  return newRequest<JaegerInfo>(HTTP_VERBS.GET, urls.jaeger, {}, {});
 };
 
-export const getNodeGraphElements = (node: NodeParamsType, params: any, proxyUrl: string | null = null) => {
+export const getAppTraces = (namespace: string, app: string, params: TracingQuery) => {
+  return newRequest<JaegerResponse>(HTTP_VERBS.GET, urls.appTraces(namespace, app), params, {});
+};
+
+export const getServiceTraces = (namespace: string, service: string, params: TracingQuery) => {
+  return newRequest<JaegerResponse>(HTTP_VERBS.GET, urls.serviceTraces(namespace, service), params, {});
+};
+
+export const getWorkloadTraces = (namespace: string, workload: string, params: TracingQuery) => {
+  return newRequest<JaegerResponse>(HTTP_VERBS.GET, urls.workloadTraces(namespace, workload), params, {});
+};
+
+export const getJaegerErrorTraces = (namespace: string, service: string, duration: DurationInSeconds) => {
+  return newRequest<number>(HTTP_VERBS.GET, urls.jaegerErrorTraces(namespace, service), { duration: duration }, {});
+};
+
+export const getJaegerTrace = (idTrace: string) => {
+  return newRequest<JaegerSingleResponse>(HTTP_VERBS.GET, urls.jaegerTrace(idTrace), {}, {});
+};
+
+export const getGraphElements = (params: any) => {
+  return newRequest<GraphDefinition>(HTTP_VERBS.GET, urls.namespacesGraphElements, params, {});
+};
+
+export const getNodeGraphElements = (node: NodeParamsType, params: any) => {
   switch (node.nodeType) {
     case NodeType.AGGREGATE:
       return !node.service
         ? newRequest<GraphDefinition>(
             HTTP_VERBS.GET,
-            proxyUrl,
             urls.aggregateGraphElements(node.namespace.name, node.aggregate!, node.aggregateValue!),
             params,
             {}
           )
         : newRequest<GraphDefinition>(
             HTTP_VERBS.GET,
-            proxyUrl,
             urls.aggregateByServiceGraphElements(
               node.namespace.name,
               node.aggregate!,
@@ -549,7 +460,6 @@ export const getNodeGraphElements = (node: NodeParamsType, params: any, proxyUrl
     case NodeType.BOX: // we only support app box node graphs, so treat like app
       return newRequest<GraphDefinition>(
         HTTP_VERBS.GET,
-        proxyUrl,
         urls.appGraphElements(node.namespace.name, node.app, node.version),
         params,
         {}
@@ -557,7 +467,6 @@ export const getNodeGraphElements = (node: NodeParamsType, params: any, proxyUrl
     case NodeType.SERVICE:
       return newRequest<GraphDefinition>(
         HTTP_VERBS.GET,
-        proxyUrl,
         urls.serviceGraphElements(node.namespace.name, node.service),
         params,
         {}
@@ -565,7 +474,6 @@ export const getNodeGraphElements = (node: NodeParamsType, params: any, proxyUrl
     case NodeType.WORKLOAD:
       return newRequest<GraphDefinition>(
         HTTP_VERBS.GET,
-        proxyUrl,
         urls.workloadGraphElements(node.namespace.name, node.workload),
         params,
         {}
@@ -576,8 +484,8 @@ export const getNodeGraphElements = (node: NodeParamsType, params: any, proxyUrl
   }
 };
 
-export const getServerConfig = (proxyUrl: string | null = null) => {
-  return newRequest<ServerConfig>(HTTP_VERBS.GET, proxyUrl, urls.serverConfig, {}, {});
+export const getServerConfig = () => {
+  return newRequest<ServerConfig>(HTTP_VERBS.GET, urls.serverConfig, {}, {});
 };
 
 export const getServiceDetail = (
@@ -585,8 +493,7 @@ export const getServiceDetail = (
   namespace: string,
   service: string,
   validate: boolean,
-  rateInterval?: DurationInSeconds,
-  proxyUrl: string | null = null
+  rateInterval?: DurationInSeconds
 ): Promise<ServiceDetailsInfo> => {
   const params: any = {};
   if (validate) {
@@ -595,36 +502,25 @@ export const getServiceDetail = (
   if (rateInterval) {
     params.rateInterval = `${rateInterval}s`;
   }
-  return newRequest<ServiceDetailsInfo>(HTTP_VERBS.GET, proxyUrl, urls.service(namespace, service), params, {}).then(
-    r => {
-      const info: ServiceDetailsInfo = r.data;
-      if (info.health) {
-        // Default rate interval in backend = 600s
-        info.health = ServiceHealth.fromJson(serverConfig, namespace, service, info.health, {
-          rateInterval: rateInterval || 600,
-          hasSidecar: info.istioSidecar
-        });
-      }
-      return info;
+  return newRequest<ServiceDetailsInfo>(HTTP_VERBS.GET, urls.service(namespace, service), params, {}).then(r => {
+    const info: ServiceDetailsInfo = r.data;
+    if (info.health) {
+      // Default rate interval in backend = 600s
+      info.health = ServiceHealth.fromJson(serverConfig, namespace, service, info.health, {
+        rateInterval: rateInterval || 600,
+        hasSidecar: info.istioSidecar
+      });
     }
-  );
+    return info;
+  });
 };
 
-export const getWorkloads = (
-  namespace: string,
-  params: { [key: string]: string } = {},
-  proxyUrl: string | null = null
-) => {
-  return newRequest<WorkloadNamespaceResponse>(HTTP_VERBS.GET, proxyUrl, urls.workloads(namespace), params, {});
+export const getWorkloads = (namespace: string, params: { [key: string]: string } = {}) => {
+  return newRequest<WorkloadNamespaceResponse>(HTTP_VERBS.GET, urls.workloads(namespace), params, {});
 };
 
-export const getWorkload = (
-  namespace: string,
-  name: string,
-  params?: { [key: string]: string },
-  proxyUrl: string | null = null
-) => {
-  return newRequest<Workload>(HTTP_VERBS.GET, proxyUrl, urls.workload(namespace, name), params, {});
+export const getWorkload = (namespace: string, name: string, params?: { [key: string]: string }) => {
+  return newRequest<Workload>(HTTP_VERBS.GET, urls.workload(namespace, name), params, {});
 };
 
 export const updateWorkload = (
@@ -632,33 +528,31 @@ export const updateWorkload = (
   name: string,
   type: string,
   jsonPatch: string,
-  patchType?: string,
-  proxyUrl: string | null = null
+  patchType?: string
 ): Promise<Response<string>> => {
   const params: any = {};
   params.type = type;
   if (patchType) {
     params.patchType = patchType;
   }
-  return newRequest(HTTP_VERBS.PATCH, proxyUrl, urls.workload(namespace, name), params, jsonPatch);
+  return newRequest(HTTP_VERBS.PATCH, urls.workload(namespace, name), params, jsonPatch);
 };
 
 export const updateService = (
   namespace: string,
   name: string,
   jsonPatch: string,
-  patchType?: string,
-  proxyUrl: string | null = null
+  patchType?: string
 ): Promise<Response<string>> => {
   const params: any = {};
   if (patchType) {
     params.patchType = patchType;
   }
-  return newRequest(HTTP_VERBS.PATCH, proxyUrl, urls.service(namespace, name), params, jsonPatch);
+  return newRequest(HTTP_VERBS.PATCH, urls.service(namespace, name), params, jsonPatch);
 };
 
-export const getPod = (namespace: string, name: string, proxyUrl: string | null = null) => {
-  return newRequest<Pod>(HTTP_VERBS.GET, proxyUrl, urls.pod(namespace, name), {}, {});
+export const getPod = (namespace: string, name: string) => {
+  return newRequest<Pod>(HTTP_VERBS.GET, urls.pod(namespace, name), {}, {});
 };
 
 export const getPodLogs = (
@@ -668,8 +562,7 @@ export const getPodLogs = (
   maxLines?: number,
   sinceTime?: number,
   duration?: DurationInSeconds,
-  isProxy?: boolean,
-  proxyUrl: string | null = null
+  isProxy?: boolean
 ) => {
   const params: any = {};
   if (container) {
@@ -686,34 +579,23 @@ export const getPodLogs = (
   }
   params.isProxy = !!isProxy;
 
-  return newRequest<PodLogs>(HTTP_VERBS.GET, proxyUrl, urls.podLogs(namespace, name), params, {});
+  return newRequest<PodLogs>(HTTP_VERBS.GET, urls.podLogs(namespace, name), params, {});
 };
 
-export const setPodEnvoyProxyLogLevel = (
-  namespace: string,
-  name: string,
-  level: string,
-  proxyUrl: string | null = null
-) => {
+export const setPodEnvoyProxyLogLevel = (namespace: string, name: string, level: string) => {
   const params: any = {};
   params.level = level;
 
-  return newRequest<undefined>(HTTP_VERBS.POST, proxyUrl, urls.podEnvoyProxyLogging(namespace, name), params, {});
+  return newRequest<undefined>(HTTP_VERBS.POST, urls.podEnvoyProxyLogging(namespace, name), params, {});
 };
 
-export const getPodEnvoyProxy = (namespace: string, pod: string, proxyUrl: string | null = null) => {
-  return newRequest<EnvoyProxyDump>(HTTP_VERBS.GET, proxyUrl, urls.podEnvoyProxy(namespace, pod), {}, {});
+export const getPodEnvoyProxy = (namespace: string, pod: string) => {
+  return newRequest<EnvoyProxyDump>(HTTP_VERBS.GET, urls.podEnvoyProxy(namespace, pod), {}, {});
 };
 
-export const getPodEnvoyProxyResourceEntries = (
-  namespace: string,
-  pod: string,
-  resource: string,
-  proxyUrl: string | null = null
-) => {
+export const getPodEnvoyProxyResourceEntries = (namespace: string, pod: string, resource: string) => {
   return newRequest<EnvoyProxyDump>(
     HTTP_VERBS.GET,
-    proxyUrl,
     urls.podEnvoyProxyResourceEntries(namespace, pod, resource),
     {},
     {}
@@ -745,44 +627,28 @@ export const getErrorDetail = (error: AxiosError): string => {
   return '';
 };
 
-export const getAppSpans = (namespace: string, app: string, params: TracingQuery, proxyUrl: string | null = null) => {
-  return newRequest<TracingSpan[]>(HTTP_VERBS.GET, proxyUrl, urls.appSpans(namespace, app), params, {});
+export const getAppSpans = (namespace: string, app: string, params: TracingQuery) => {
+  return newRequest<TracingSpan[]>(HTTP_VERBS.GET, urls.appSpans(namespace, app), params, {});
 };
 
-export const getServiceSpans = (
-  namespace: string,
-  service: string,
-  params: TracingQuery,
-  proxyUrl: string | null = null
-) => {
-  return newRequest<TracingSpan[]>(HTTP_VERBS.GET, proxyUrl, urls.serviceSpans(namespace, service), params, {});
+export const getServiceSpans = (namespace: string, service: string, params: TracingQuery) => {
+  return newRequest<TracingSpan[]>(HTTP_VERBS.GET, urls.serviceSpans(namespace, service), params, {});
 };
 
-export const getWorkloadSpans = (
-  namespace: string,
-  workload: string,
-  params: TracingQuery,
-  proxyUrl: string | null = null
-) => {
-  return newRequest<TracingSpan[]>(HTTP_VERBS.GET, proxyUrl, urls.workloadSpans(namespace, workload), params, {});
+export const getWorkloadSpans = (namespace: string, workload: string, params: TracingQuery) => {
+  return newRequest<TracingSpan[]>(HTTP_VERBS.GET, urls.workloadSpans(namespace, workload), params, {});
 };
 
-export const getIstioPermissions = (namespaces: string[], proxyUrl: string | null = null) => {
-  return newRequest<IstioPermissions>(
-    HTTP_VERBS.GET,
-    proxyUrl,
-    urls.istioPermissions,
-    { namespaces: namespaces.join(',') },
-    {}
-  );
+export const getIstioPermissions = (namespaces: string[]) => {
+  return newRequest<IstioPermissions>(HTTP_VERBS.GET, urls.istioPermissions, { namespaces: namespaces.join(',') }, {});
 };
 
-export const getMetricsStats = (queries: MetricsStatsQuery[], proxyUrl: string | null = null) => {
-  return newRequest<MetricsStatsResult>(HTTP_VERBS.POST, proxyUrl, urls.metricsStats, {}, { queries: queries });
+export const getMetricsStats = (queries: MetricsStatsQuery[]) => {
+  return newRequest<MetricsStatsResult>(HTTP_VERBS.POST, urls.metricsStats, {}, { queries: queries });
 };
 
-export const getClusters = (proxyUrl: string | null = null) => {
-  return newRequest<MeshClusters>(HTTP_VERBS.GET, proxyUrl, urls.clusters, {}, {});
+export const getClusters = () => {
+  return newRequest<MeshClusters>(HTTP_VERBS.GET, urls.clusters, {}, {});
 };
 
 export function deleteServiceTrafficRouting(
@@ -795,8 +661,7 @@ export function deleteServiceTrafficRouting(serviceDetail: ServiceDetailsInfo): 
 export function deleteServiceTrafficRouting(
   vsOrSvc: VirtualService[] | ServiceDetailsInfo,
   destinationRules?: DestinationRuleC[],
-  k8sHTTPRouteList?: K8sHTTPRoute[],
-  proxyUrl: string | null = null
+  k8sHTTPRouteList?: K8sHTTPRoute[]
 ): Promise<any> {
   let vsList: VirtualService[];
   let drList: DestinationRuleC[];
@@ -814,37 +679,29 @@ export function deleteServiceTrafficRouting(
   }
 
   vsList.forEach(vs => {
-    deletePromises.push(
-      deleteIstioConfigDetail(vs.metadata.namespace || '', 'virtualservices', vs.metadata.name, proxyUrl)
-    );
+    deletePromises.push(deleteIstioConfigDetail(vs.metadata.namespace || '', 'virtualservices', vs.metadata.name));
   });
 
   routeList.forEach(k8sr => {
-    deletePromises.push(
-      deleteIstioConfigDetail(k8sr.metadata.namespace || '', 'k8shttproutes', k8sr.metadata.name, proxyUrl)
-    );
+    deletePromises.push(deleteIstioConfigDetail(k8sr.metadata.namespace || '', 'k8shttproutes', k8sr.metadata.name));
   });
 
   drList.forEach(dr => {
-    deletePromises.push(
-      deleteIstioConfigDetail(dr.metadata.namespace || '', 'destinationrules', dr.metadata.name, proxyUrl)
-    );
+    deletePromises.push(deleteIstioConfigDetail(dr.metadata.namespace || '', 'destinationrules', dr.metadata.name));
 
     const paName = dr.hasPeerAuthentication();
     if (paName) {
-      deletePromises.push(
-        deleteIstioConfigDetail(dr.metadata.namespace || '', 'peerauthentications', paName, proxyUrl)
-      );
+      deletePromises.push(deleteIstioConfigDetail(dr.metadata.namespace || '', 'peerauthentications', paName));
     }
   });
 
   return Promise.all(deletePromises);
 }
 
-export const getCrippledFeatures = (proxyUrl: string | null = null): Promise<Response<KialiCrippledFeatures>> => {
-  return newRequest<KialiCrippledFeatures>(HTTP_VERBS.GET, proxyUrl, urls.crippledFeatures, {}, {});
+export const getCrippledFeatures = (): Promise<Response<KialiCrippledFeatures>> => {
+  return newRequest<KialiCrippledFeatures>(HTTP_VERBS.GET, urls.crippledFeatures, {}, {});
 };
 
-export const getCanaryUpgradeStatus = (proxyUrl: string | null = null) => {
-  return newRequest<CanaryUpgradeStatus>(HTTP_VERBS.GET, proxyUrl, urls.canaryUpgradeStatus(), {}, {});
+export const getCanaryUpgradeStatus = () => {
+  return newRequest<CanaryUpgradeStatus>(HTTP_VERBS.GET, urls.canaryUpgradeStatus(), {}, {});
 };

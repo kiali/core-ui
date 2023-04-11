@@ -7,11 +7,11 @@ import {
 } from '@patternfly/react-icons';
 import { Text, TextVariants } from '@patternfly/react-core';
 import { SVGIconProps } from '@patternfly/react-icons/dist/js/createIcon';
-import { style } from 'typestyle';
 import { ValidationTypes } from '../../types/IstioObjects';
 import { PFColors } from '../Pf/PfColors';
+import { getKialiStyle } from '../../utils/StyleUtils';
 
-const validationStyle = style({
+const validationStyle = getKialiStyle({
   textAlign: 'left',
   $nest: {
     '&:last-child p': {
