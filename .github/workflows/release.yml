@@ -46,7 +46,7 @@ jobs:
         cache: yarn
         cache-dependency-path: yarn.lock
     - name: Install dependencies and build 🔧
-      run: yarn install && yarn run build    
+      run: yarn install && yarn build    
     - name: Major release
       if: "${{ github.event.inputs.release_type == 'major' }}"
       run: yarn version --major --no-git-tag-version
@@ -65,10 +65,10 @@ jobs:
         path-to-changelog: CHANGELOG.md
         version: ${{ env.NEW_VERSION }}
         operation: release          
-    - name: Publish package on Yarn 📦
+    - name: Publish package 📦
       run: |
         echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-        yarn publish --no-verify-access
+        npm publish --no-verify-access
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     - name: Push changes to repository
