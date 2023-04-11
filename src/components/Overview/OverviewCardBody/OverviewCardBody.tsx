@@ -8,18 +8,18 @@ import {
   OutboundTrafficPolicy,
   ValidationStatus
 } from '../../../types';
-import { OverviewDisplayMode, PFColors } from '../../';
 import { NamespaceStatuses } from './NamespaceStatuses';
 import CanaryUpgradeProgress from './CanaryUpgradeProgress';
 import { OverviewCardSparklineCharts } from './OverviewCardSparklineCharts';
 import TLSInfo from './TLSInfo';
 import ControlPlaneNamespaceStatus from './ControlPlaneNamespaceStatus';
-import { DirectionType, OverviewType } from '../OverviewToolbar';
+import { DirectionType, OverviewDisplayMode, OverviewType } from '../OverviewToolbar';
 import { NamespaceMTLSStatus } from '../../MTls/NamespaceMTLSStatus';
 import { ValidationSummary } from '../../Validations';
 import ValidationSummaryLinkContainer from '../../Link/ValidationSummaryLink';
 import * as React from 'react';
 import { ComputedServerConfig } from '../../../config';
+import { PFColors } from '../../Pf';
 
 const renderLabels = (ns: NamespaceInfo, setDisplayMode?: (display: OverviewDisplayMode) => void): JSX.Element => {
   const labelsLength = ns.labels ? `${Object.entries(ns.labels).length}` : 'No';

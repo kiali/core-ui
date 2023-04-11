@@ -8,10 +8,12 @@ import {
   OutboundTrafficPolicy,
   IstiodResourceThresholds
 } from '../../types';
-import { DirectionType, OverviewCardBody, OverviewCardHeader, OverviewDisplayMode, OverviewType } from './';
+import { DirectionType, OverviewDisplayMode, OverviewType } from './OverviewToolbar';
 import * as React from 'react';
 import { style } from 'typestyle';
 import { ComputedServerConfig } from '../../config';
+import { OverviewCardHeader } from './OverviewCardHeader';
+import { OverviewCardBody } from './OverviewCardBody';
 
 const cardControlPlaneGridStyle = style({
   textAlign: 'center',

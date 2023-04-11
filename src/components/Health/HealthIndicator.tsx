@@ -1,26 +1,26 @@
 import * as React from 'react';
 import { PopoverPosition, Tooltip } from '@patternfly/react-core';
 import { HealthDetails } from './HealthDetails';
-import * as H from '../../types/Health';
 import { createIcon } from './Helper';
 import { ComputedServerConfig, createTooltipIcon } from '../../config';
 import './Health.css';
+import { Health, Status, NA } from '../../types';
 
 interface Props {
   id: string;
-  health?: H.Health;
+  health?: Health;
   tooltipPlacement?: PopoverPosition;
   serverConfig: ComputedServerConfig;
 }
 
 interface HealthState {
-  globalStatus: H.Status;
+  globalStatus: Status;
 }
 
 export class HealthIndicator extends React.PureComponent<Props, HealthState> {
   static getDerivedStateFromProps(props: Props) {
     return {
-      globalStatus: props.health ? props.health.getGlobalStatus() : H.NA
+      globalStatus: props.health ? props.health.getGlobalStatus() : NA
     };
   }
 
