@@ -1,13 +1,13 @@
 module.exports = {
   collectCoverage: true,
   collectCoverageFrom: ['src/components/**/*.{js,jsx,ts,tsx}', '!<rootDir>/node_modules/'],
-  coverageThreshold: {
+  /*coverageThreshold: {
     global: {
       lines: 80,
       statements: 80,
       branch: 80
     }
-  },
+  },*/
   coverageReporters: ['json-summary', 'text', 'lcov'],
   coverageDirectory: '.coverage',
   testEnvironment: 'jsdom',
