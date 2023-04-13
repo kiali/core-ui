@@ -1,6 +1,6 @@
 import _ from 'lodash';
-import { ServerConfig } from '../types/';
-import { parseHealthConfig } from './';
+import { ServerConfig } from '../types/ServerConfig';
+import { parseHealthConfig } from './HealthConfig';
 
 export type Durations = { [key: number]: string };
 

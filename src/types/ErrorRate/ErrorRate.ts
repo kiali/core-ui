@@ -1,15 +1,15 @@
 import {
-  getRequestErrorsStatus,
   HEALTHY,
   NA,
   RATIO_NA,
-  RateHealth,
   RequestHealth,
   RequestType,
   ThresholdStatus,
-  ToleranceConfig
-} from '../';
-import { checkExpr, emptyRate, getRateHealthConfig, getErrorCodeRate } from './utils';
+  getRequestErrorsStatus
+} from '../HealthStatus';
+import { RateHealth } from '../HealthAnnotation';
+import { ToleranceConfig } from '../ServerConfig';
+import { checkExpr, getRateHealthConfig, getErrorCodeRate, aggregate } from './utils';
 import { ComputedServerConfig } from '../../config';
 import { ErrorRatio, Rate, RequestTolerance } from './types';
 
@@ -127,46 +127,6 @@ export const calculateStatus = (
         result.protocol = protocol;
         result.toleranceConfig = reqTol.tolerance;
       }
-    }
-  }
-  return result;
-};
-
-export const generateRateForTolerance = (
-  tol: RequestTolerance,
-  requests: { [key: string]: { [key: string]: number } }
-) => {
-  for (let [protocol, req] of Object.entries(requests)) {
-    if (checkExpr(tol!.tolerance!.protocol, protocol)) {
-      for (let [code, value] of Object.entries(req)) {
-        if (!Object.keys(tol.requests).includes(protocol)) {
-          tol.requests[protocol] = emptyRate();
-        }
-        (tol.requests[protocol] as Rate).requestRate += Number(value);
-        if (checkExpr(tol!.tolerance!.code, code)) {
-          (tol.requests[protocol] as Rate).errorRate += Number(value);
-        }
-      }
-    }
-    if (Object.keys(tol.requests).includes(protocol)) {
-      if ((tol.requests[protocol] as Rate).requestRate === 0) {
-        (tol.requests[protocol] as Rate).errorRatio = -1;
-      } else {
-        (tol.requests[protocol] as Rate).errorRatio =
-          (tol.requests[protocol] as Rate).errorRate / (tol.requests[protocol] as Rate).requestRate;
-      }
-    }
-  }
-};
-
-// Aggregate the results
-export const aggregate = (request: RequestType, tolerances?: ToleranceConfig[]): RequestTolerance[] => {
-  let result: RequestTolerance[] = [];
-  if (request && tolerances) {
-    for (let tol of Object.values(tolerances)) {
-      let newReqTol: RequestTolerance = { tolerance: tol, requests: {} };
-      generateRateForTolerance(newReqTol, request);
-      result.push(newReqTol);
     }
   }
   return result;

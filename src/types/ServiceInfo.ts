@@ -1,5 +1,5 @@
 /* eslint-disable no-redeclare */
-import { DEGRADED, FAILURE, HEALTHY, NA, ServiceHealth, Status } from './Health';
+import { DEGRADED, FAILURE, HEALTHY, NA, Status } from './HealthStatus';
 import {
   DestinationRule,
   getWizardUpdateLabel,
@@ -16,7 +16,7 @@ import { TLSStatus } from './TLSStatus';
 import { AdditionalItem } from './Workload';
 import { ResourcePermissions } from './Permissions';
 import { ServiceOverview } from './ServiceList';
-import { Namespace, WorkloadOverview } from './';
+import { Namespace, WorkloadOverview, ServiceHealth } from './';
 
 export interface ServicePort {
   name: string;
