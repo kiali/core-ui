@@ -4,7 +4,6 @@ export * from './CytoscapeGraph';
 export * from './IstioConfigUtils';
 export * from './RateIntervals';
 export * from './SafeRender';
-export * from './StyleUtils';
 export * from './TimeSeriesUtils';
 export * from './VictoryChartsUtils';
 export * from './VictoryEvents';

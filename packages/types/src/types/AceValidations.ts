@@ -3,6 +3,8 @@ import { Annotation } from 'react-ace/types';
 import { IMarker } from 'react-ace';
 import * as jsYaml from 'js-yaml';
 
+export type { Annotation };
+
 export interface AceValidations {
   markers: Array<IMarker>;
   annotations: Array<Annotation>;

@@ -18,7 +18,7 @@ import ControlPlaneNamespaceStatus from './ControlPlaneNamespaceStatus';
 import { DirectionType, OverviewDisplayMode, OverviewType } from '../OverviewToolbar';
 import { NamespaceMTLSStatus } from '../../MTls/NamespaceMTLSStatus';
 import { ValidationSummary } from '../../Validations';
-import ValidationSummaryLinkContainer from '../../Link/ValidationSummaryLink';
+import { ValidationSummaryLink } from '../../Link/ValidationSummaryLink';
 import * as React from 'react';
 
 const renderLabels = (ns: NamespaceInfo, setDisplayMode?: (display: OverviewDisplayMode) => void): JSX.Element => {
@@ -66,7 +66,7 @@ const renderIstioConfigStatus = (ns: NamespaceInfo, link?: string): JSX.Element 
   }
 
   return (
-    <ValidationSummaryLinkContainer
+    <ValidationSummaryLink
       namespace={ns.name}
       objectCount={validations.objectCount}
       errors={validations.errors}
@@ -79,7 +79,7 @@ const renderIstioConfigStatus = (ns: NamespaceInfo, link?: string): JSX.Element 
         warnings={validations.warnings}
         objectCount={validations.objectCount}
       />
-    </ValidationSummaryLinkContainer>
+    </ValidationSummaryLink>
   );
 };
 

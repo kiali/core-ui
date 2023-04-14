@@ -1,6 +1,6 @@
 import { PFColors } from '@kiali/types';
 import { Badge, Tooltip, TooltipPosition } from '@patternfly/react-core';
-import React, { CSSProperties } from 'react';
+import React from 'react';
 import { style } from 'typestyle';
 
 export type PFBadgeType = {
@@ -108,7 +108,7 @@ type PFBadgeProps = {
   keyValue?: string;
   position?: TooltipPosition; // default=auto
   size?: 'global' | 'sm';
-  style?: CSSProperties;
+  style?: React.CSSProperties;
   tooltip?: React.ReactFragment;
 };
 
