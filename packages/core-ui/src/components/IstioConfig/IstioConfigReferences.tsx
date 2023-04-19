@@ -1,15 +1,17 @@
 import { Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
-import { ReferenceIstioObjectLink } from '../Link/IstioObjectLink';
-import { ServiceLink } from '../Link/ServiceLink';
-import { WorkloadLink } from '../Link/WorkloadLink';
 import * as React from 'react';
+<<<<<<< HEAD:packages/core-ui/src/components/IstioConfig/IstioConfigReferences.tsx
 import { ObjectReference, ServiceReference, WorkloadReference } from '@kiali/types';
+=======
+import { ObjectReference, ServiceReference, WorkloadReference } from '../../types/IstioObjects';
+>>>>>>> 21ce4d7 (Fix lint errors and enable linkTemplate):src/components/IstioConfig/IstioConfigReferences.tsx
 
 interface IstioConfigReferencesProps {
   objectReferences: ObjectReference[];
   serviceReferences: ServiceReference[];
   workloadReferences: WorkloadReference[];
   isValid: boolean | undefined;
+  linkTemplate: (name: string, namespace: string, objectType: string) => JSX.Element;
 }
 
 export class IstioConfigReferences extends React.Component<IstioConfigReferencesProps> {
@@ -48,28 +50,31 @@ export class IstioConfigReferences extends React.Component<IstioConfigReferences
         {this.serviceReferencesExists() &&
           this.props.serviceReferences.map(reference => {
             return (
-              <StackItem>
-                <ServiceLink name={reference.name} namespace={reference.namespace} />
+              <StackItem key={'service-' + reference.namespace + '-' + reference.name}>
+                {/* <ServiceLink name={reference.name} namespace={reference.namespace} /> */}
+                {this.props.linkTemplate(reference.name, reference.namespace, 'service')}
               </StackItem>
             );
           })}
         {this.workloadReferencesExists() &&
           this.props.workloadReferences.map(reference => {
             return (
-              <StackItem>
-                <WorkloadLink name={reference.name} namespace={reference.namespace} />
+              <StackItem key={'workload-' + reference.namespace + '-' + reference.name}>
+                {/* <WorkloadLink name={reference.name} namespace={reference.namespace} cluster={HomeClusterName} /> */}
+                {this.props.linkTemplate(reference.name, reference.namespace, 'workload')}
               </StackItem>
             );
           })}
         {this.objectReferencesExists() &&
           this.props.objectReferences.map(reference => {
             return (
-              <StackItem>
-                <ReferenceIstioObjectLink
+              <StackItem key={'istio-' + reference.namespace + '-' + reference.name}>
+                {this.props.linkTemplate(reference.name, reference.namespace, reference.objectType)}
+                {/* <ReferenceIstioObjectLink
                   name={reference.name}
                   namespace={reference.namespace}
                   type={reference.objectType}
-                />
+                /> */}
               </StackItem>
             );
           })}

@@ -20,7 +20,7 @@ export class IstioConfigValidationReferences extends React.Component<IstioConfig
         {this.props.objectReferences &&
           this.props.objectReferences.map(reference => {
             return (
-              <StackItem>
+              <StackItem key={'istio-' + reference.namespace + '-' + reference.name}>
                 <ReferenceIstioObjectLink
                   name={reference.name}
                   namespace={reference.namespace}

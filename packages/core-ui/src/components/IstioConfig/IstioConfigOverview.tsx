@@ -36,6 +36,7 @@ interface IstioConfigOverviewProps {
   selectedLine?: string;
   // kiosk: string;
   istioAPIEnabled: boolean;
+  linkTemplate: (name: string, namespace: string, objectType: string) => JSX.Element;
 }
 
 const iconStyle = style({
@@ -173,6 +174,7 @@ export class IstioConfigOverview extends React.Component<IstioConfigOverviewProp
               serviceReferences={this.props.serviceReferences}
               workloadReferences={this.props.workloadReferences}
               isValid={this.props.istioValidations?.valid}
+              linkTemplate={this.props.linkTemplate}
             />
           </StackItem>
         )}
