@@ -17,12 +17,12 @@ import {
   ValidationTypes,
   WorkloadReference
 } from '@kiali/types';
-import { style } from 'typestyle';
 import LocalTime from '../Time/LocalTime';
 import { IstioConfigHelp } from './IstioConfigHelp';
 import { IstioStatusMessageList } from './IstioStatusMessageList';
 import { IstioConfigValidationReferences } from './IstioConfigValidationReferences';
 import { IstioConfigReferences } from './IstioConfigReferences';
+import { getKialiStyle } from '../../utils';
 
 interface IstioConfigOverviewProps {
   istioObjectDetails: IstioConfigDetails;
@@ -39,29 +39,29 @@ interface IstioConfigOverviewProps {
   linkTemplate: (name: string, namespace: string, objectType: string) => JSX.Element;
 }
 
-const iconStyle = style({
+const iconStyle = getKialiStyle({
   margin: '0 0 0 0',
   padding: '0 0 0 0',
   display: 'inline-block',
   verticalAlign: '2px !important'
 });
 
-const infoStyle = style({
+const infoStyle = getKialiStyle({
   margin: '0px 0px 2px 10px',
   verticalAlign: '-5px !important'
 });
 
-const warnStyle = style({
+const warnStyle = getKialiStyle({
   margin: '0px 0px 2px 0px',
   verticalAlign: '-3px !important'
 });
 
-const healthIconStyle = style({
+const healthIconStyle = getKialiStyle({
   marginLeft: '10px',
   verticalAlign: '-1px !important'
 });
 
-const resourceListStyle = style({
+const resourceListStyle = getKialiStyle({
   margin: '0px 0 11px 0',
   $nest: {
     '& > ul > li > span': {
@@ -102,14 +102,6 @@ export class IstioConfigOverview extends React.Component<IstioConfigOverviewProp
         </ul>
       </div>
     );
-
-    // let urlInKiali = '';
-    // if (istioObject !== undefined && istioObject.metadata.namespace !== undefined && istioObject.kind !== undefined) {
-    //   // here a "/console" is required as external link is used
-    //   urlInKiali =
-    //     '/console' +
-    //     GetIstioObjectUrl(istioObject.metadata.name, istioObject.metadata.namespace, istioObject.kind.toLowerCase());
-    // }
 
     return (
       <Stack hasGutter={true}>
@@ -163,7 +155,10 @@ export class IstioConfigOverview extends React.Component<IstioConfigOverviewProp
 
         {this.props.istioValidations?.references && (
           <StackItem>
-            <IstioConfigValidationReferences objectReferences={this.props.istioValidations.references} />
+            <IstioConfigValidationReferences
+              objectReferences={this.props.istioValidations.references}
+              linkTemplate={this.props.linkTemplate}
+            />
           </StackItem>
         )}
 
@@ -193,28 +188,6 @@ export class IstioConfigOverview extends React.Component<IstioConfigOverviewProp
             configuration as the Istio config validations are disabled when the Istio API is disabled.
           </StackItem>
         )}
-        {/* <KioskElement>
-          <StackItem>
-            <Tooltip
-              content={
-                'This is a Read only view of the YAML including Validations. It is possible to edit directly in Kiali '
-              }
-              position={TooltipPosition.top}
-            >
-              <Label color="green" isCompact>
-                Read only mode
-              </Label>
-            </Tooltip>
-            <a
-              href={urlInKiali}
-              style={{ marginLeft: '5px', fontSize: '85%', color: PFColors.ActiveText }}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Edit in Kiali
-            </a>
-          </StackItem>
-        </KioskElement> */}
       </Stack>
     );
   }

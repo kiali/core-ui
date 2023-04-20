@@ -1,8 +1,4 @@
-// import { useSelector } from 'react-redux';
 import { TimeInMilliseconds } from '@kiali/types';
-
-// let numSubscribers = 0;
-// let intervalId: null | number = null;
 
 function doTick(time?: TimeInMilliseconds) {
   const refreshTick = new CustomEvent('refreshTick', { detail: time ?? Date.now() });
@@ -12,50 +8,3 @@ function doTick(time?: TimeInMilliseconds) {
 export function triggerRefresh(time?: TimeInMilliseconds) {
   doTick(time);
 }
-
-// export default function useRefreshInterval() {
-//   const refreshInterval = useSelector<KialiAppState, IntervalInMilliseconds>(
-//     state => state.userSettings.refreshInterval
-//   );
-//   const [lastRefreshAt, setLastRefreshAt] = useState<TimeInMilliseconds>(Date.now());
-//   const [previousRefreshAt, setPreviousRefreshAt] = useState<TimeInMilliseconds>(lastRefreshAt);
-
-//   useEffect(() => {
-//     function handleTick(e: CustomEventInit<TimeInMilliseconds>) {
-//       setPreviousRefreshAt(lastRefreshAt);
-//       setLastRefreshAt(e.detail!);
-//     }
-
-//     // Subscribe
-//     document.addEventListener('refreshTick', handleTick);
-//     numSubscribers++;
-
-//     return function () {
-//       // Unsubscribe;
-//       document.removeEventListener('refreshTick', handleTick);
-//       numSubscribers--;
-//     };
-//   }, [lastRefreshAt]);
-
-//   useEffect(() => {
-//     if (intervalId !== null) {
-//       // When mounting, reset the timer.
-//       // Also, if refreshInterval changed, set a new timer.
-//       window.clearInterval(intervalId);
-//       intervalId = null;
-//     }
-
-//     if (numSubscribers !== 0 && refreshInterval !== 0) {
-//       intervalId = window.setInterval(triggerRefresh, refreshInterval);
-//     }
-
-//     return function () {
-//       if (intervalId !== null && numSubscribers === 0) {
-//         window.clearInterval(intervalId);
-//         intervalId = null;
-//       }
-//     };
-//   }, [refreshInterval]);
-
-//   return { lastRefreshAt, previousRefreshAt, refreshInterval };
-// }

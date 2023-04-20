@@ -1,10 +1,10 @@
 import { Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
-import { ReferenceIstioObjectLink } from '../Link/IstioObjectLink';
 import * as React from 'react';
 import { ObjectReference } from '@kiali/types';
 
 interface IstioConfigReferencesProps {
   objectReferences: ObjectReference[];
+  linkTemplate: (name: string, namespace: string, objectType: string) => JSX.Element;
 }
 
 export class IstioConfigValidationReferences extends React.Component<IstioConfigReferencesProps> {
@@ -21,11 +21,7 @@ export class IstioConfigValidationReferences extends React.Component<IstioConfig
           this.props.objectReferences.map(reference => {
             return (
               <StackItem key={'istio-' + reference.namespace + '-' + reference.name}>
-                <ReferenceIstioObjectLink
-                  name={reference.name}
-                  namespace={reference.namespace}
-                  type={reference.objectType}
-                />
+                {this.props.linkTemplate(reference.name, reference.namespace, reference.objectType)}
               </StackItem>
             );
           })}

@@ -51,7 +51,6 @@ export class IstioConfigReferences extends React.Component<IstioConfigReferences
           this.props.serviceReferences.map(reference => {
             return (
               <StackItem key={'service-' + reference.namespace + '-' + reference.name}>
-                {/* <ServiceLink name={reference.name} namespace={reference.namespace} /> */}
                 {this.props.linkTemplate(reference.name, reference.namespace, 'service')}
               </StackItem>
             );
@@ -60,7 +59,6 @@ export class IstioConfigReferences extends React.Component<IstioConfigReferences
           this.props.workloadReferences.map(reference => {
             return (
               <StackItem key={'workload-' + reference.namespace + '-' + reference.name}>
-                {/* <WorkloadLink name={reference.name} namespace={reference.namespace} cluster={HomeClusterName} /> */}
                 {this.props.linkTemplate(reference.name, reference.namespace, 'workload')}
               </StackItem>
             );
@@ -70,11 +68,6 @@ export class IstioConfigReferences extends React.Component<IstioConfigReferences
             return (
               <StackItem key={'istio-' + reference.namespace + '-' + reference.name}>
                 {this.props.linkTemplate(reference.name, reference.namespace, reference.objectType)}
-                {/* <ReferenceIstioObjectLink
-                  name={reference.name}
-                  namespace={reference.namespace}
-                  type={reference.objectType}
-                /> */}
               </StackItem>
             );
           })}
