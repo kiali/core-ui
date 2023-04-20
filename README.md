@@ -93,6 +93,16 @@ cd work/core-ui
 yarn install
 ```
 
+## Component styles
+
+Component styles are created using typestyle library (https://typestyle.github.io/#/). Instead of using default style method, it is mandatory to use getKialiStyle internal method to add custom prefix to generated CSS. Custom prefix is defined as environment variable in the application (e.g., CSS_PREFIX=kiali)
+
+```
+const iconStyle = getKialiStyle({
+  width: '10px'
+});
+```
+
 ## Semantic Commit Messages
 
 We should set commit message with this format:

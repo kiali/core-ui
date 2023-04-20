@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { Label } from './Label';
 import { Button, ButtonVariant, Tooltip, TooltipPosition } from '@patternfly/react-core';
-import { style } from 'typestyle';
 import { KialiIcon } from '../../config/KialiIcon';
+import { getKialiStyle } from '@kiali/types';
 
 const SHOW_MORE_TRESHOLD = 2;
 
@@ -16,17 +16,17 @@ interface State {
   expanded: boolean;
 }
 
-const linkStyle = style({
+const linkStyle = getKialiStyle({
   padding: '0 4px 0 4px',
   fontSize: '0.8rem',
   bottom: '2px'
 });
 
-const infoStyle = style({
+const infoStyle = getKialiStyle({
   margin: '4px 4px 2px 5px'
 });
 
-const labelsContainerStyle = style({
+const labelsContainerStyle = getKialiStyle({
   overflow: 'hidden'
 });
 

@@ -1,15 +1,14 @@
 import React from 'react';
-import { highestSeverity, ObjectCheck, PFColors, ValidationTypes } from '@kiali/types';
+import { highestSeverity, ObjectCheck, PFColors, ValidationTypes, getKialiStyle } from '@kiali/types';
 import { Validation } from './Validation';
 import { Stack, StackItem, Text, TextVariants } from '@patternfly/react-core';
-import { style } from 'typestyle';
 
 type Props = {
   checks?: ObjectCheck[];
 };
 
-const colorStyle = style({ color: PFColors.White });
-const titleStyle = style({ color: PFColors.White, fontSize: '1.1rem' });
+const colorStyle = getKialiStyle({ color: PFColors.White });
+const titleStyle = getKialiStyle({ color: PFColors.White, fontSize: '1.1rem' });
 
 class ValidationStack extends React.Component<Props> {
   validationList() {

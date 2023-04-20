@@ -7,20 +7,20 @@ import {
   NamespaceInfo,
   OutboundTrafficPolicy,
   IstiodResourceThresholds,
-  ComputedServerConfig
+  ComputedServerConfig,
+  getKialiStyle
 } from '@kiali/types';
 import { DirectionType, OverviewDisplayMode, OverviewType } from './OverviewToolbar';
 import * as React from 'react';
-import { style } from 'typestyle';
 import { OverviewCardHeader } from './OverviewCardHeader';
 import { OverviewCardBody } from './OverviewCardBody';
 
-const cardControlPlaneGridStyle = style({
+const cardControlPlaneGridStyle = getKialiStyle({
   textAlign: 'center',
   marginTop: '0px',
   marginBottom: '10px'
 });
-const cardGridStyle = style({
+const cardGridStyle = getKialiStyle({
   textAlign: 'center',
   marginTop: '0px',
   marginBottom: '10px'

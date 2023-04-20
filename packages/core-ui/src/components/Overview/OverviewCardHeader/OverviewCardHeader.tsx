@@ -1,13 +1,12 @@
 import { CardHeader, CardHeaderMain, Label, Title, TitleSizes } from '@patternfly/react-core';
 import { ControlPlaneBadge } from './ControlPlaneBadge';
 import { ControlPlaneVersionBadge } from './ControlPlaneVersionBadge';
-import { CanaryUpgradeStatus, ComponentStatus, NamespaceInfo } from '@kiali/types';
+import { CanaryUpgradeStatus, ComponentStatus, NamespaceInfo, getKialiStyle } from '@kiali/types';
 import * as React from 'react';
-import { style } from 'typestyle';
 
 const NS_LONG = 20;
 
-const cardNamespaceNameLongStyle = style({
+const cardNamespaceNameLongStyle = getKialiStyle({
   display: 'inline-block',
   maxWidth: 'calc(100% - 75px)',
   overflow: 'hidden',
@@ -16,7 +15,7 @@ const cardNamespaceNameLongStyle = style({
   whiteSpace: 'nowrap'
 });
 
-const cardNamespaceNameNormalStyle = style({
+const cardNamespaceNameNormalStyle = getKialiStyle({
   display: 'inline-block',
   verticalAlign: 'middle'
 });

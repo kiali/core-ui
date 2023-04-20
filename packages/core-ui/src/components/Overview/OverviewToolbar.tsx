@@ -28,13 +28,13 @@ import {
   FilterType,
   SortField,
   PFColors,
-  ComputedServerConfig
+  ComputedServerConfig,
+  getKialiStyle
 } from '@kiali/types';
 import { availableFilters, LabelFilters } from './OverviewToolbar/';
 import { ToolbarDropdown } from '../ToolbarDropwdown/ToolbarDropdown';
 import { TimeDurationComponent } from '../Time/TimeDurationComponent';
 import * as Sorts from './Sorts';
-import { style } from 'typestyle';
 
 export enum OverviewDisplayMode {
   COMPACT,
@@ -64,35 +64,35 @@ const sortTypes = (function () {
   return o;
 })();
 
-const containerPadding = style({
+const containerPadding = getKialiStyle({
   backgroundColor: PFColors.White,
   padding: '0px 20px 0px 20px'
 });
 
-const containerFlex = style({
+const containerFlex = getKialiStyle({
   display: 'flex',
   flexWrap: 'wrap'
 });
 
-const filterToolbarStyle = style({
+const filterToolbarStyle = getKialiStyle({
   paddingTop: '10px'
 });
 
-const rightToolbarStyle = style({
+const rightToolbarStyle = getKialiStyle({
   marginLeft: 'auto',
   height: '118px',
   padding: '10px 0px 0px 0px'
 });
 
-const timeToolbarStyle = style({
+const timeToolbarStyle = getKialiStyle({
   textAlign: 'right'
 });
 
-const actionsToolbarStyle = style({
+const actionsToolbarStyle = getKialiStyle({
   paddingTop: '17px'
 });
 
-const typeSelectStyle = style({
+const typeSelectStyle = getKialiStyle({
   paddingRight: '6px'
 });
 
@@ -100,7 +100,7 @@ export type OverviewType = keyof typeof overviewTypes;
 
 export type DirectionType = keyof typeof directionTypes;
 
-const toolbarStyle = style({
+const toolbarStyle = getKialiStyle({
   padding: 0,
   rowGap: 'var(--pf-global--spacer--md)',
   $nest: {

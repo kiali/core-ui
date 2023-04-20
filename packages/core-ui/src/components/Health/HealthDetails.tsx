@@ -3,7 +3,6 @@ import { createIcon } from './Helper';
 import { InfoAltIcon } from '@patternfly/react-icons';
 import './Health.css';
 import { Title, TitleSizes } from '@patternfly/react-core';
-import { style } from 'typestyle';
 import {
   ComputedServerConfig,
   DEGRADED,
@@ -12,7 +11,8 @@ import {
   HealthItem,
   HEALTHY,
   PFColors,
-  TRAFFICSTATUS
+  TRAFFICSTATUS,
+  getKialiStyle
 } from '@kiali/types';
 
 interface Props {
@@ -20,7 +20,7 @@ interface Props {
   serverConfig: ComputedServerConfig;
 }
 
-const titleStyle = style({
+const titleStyle = getKialiStyle({
   margin: '15px 0 8px 0'
 });
 

@@ -1,10 +1,9 @@
 import { Tooltip, TooltipPosition, Label } from '@patternfly/react-core';
 import { KialiIcon } from '../../../config/KialiIcon';
 import * as React from 'react';
-import { style } from 'typestyle';
-import { NamespaceInfo, OutboundTrafficPolicy } from '@kiali/types';
+import { NamespaceInfo, OutboundTrafficPolicy, getKialiStyle } from '@kiali/types';
 
-export const infoStyle = style({
+export const infoStyle = getKialiStyle({
   margin: '0px 0px -1px 4px'
 });
 

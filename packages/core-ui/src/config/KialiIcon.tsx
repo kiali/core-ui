@@ -56,14 +56,13 @@ import {
   WarningTriangleIcon,
   ProcessAutomationIcon
 } from '@patternfly/react-icons';
-import { style } from 'typestyle';
-import { PFColors } from '@kiali/types';
+import { PFColors, getKialiStyle } from '@kiali/types';
 
-export const defaultIconStyle = style({
+export const defaultIconStyle = getKialiStyle({
   // nothing special
 });
 
-const iconStyle = style({
+const iconStyle = getKialiStyle({
   width: '10px'
 });
 

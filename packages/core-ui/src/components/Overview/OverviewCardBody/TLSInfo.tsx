@@ -1,8 +1,7 @@
 import { Label, Tooltip, TooltipPosition } from '@patternfly/react-core';
 import { KialiIcon } from '../../../config/KialiIcon';
 import * as React from 'react';
-import { style } from 'typestyle';
-import { CertsInfo } from '@kiali/types';
+import { CertsInfo, getKialiStyle } from '@kiali/types';
 import { infoStyle } from './ControlPlaneNamespaceStatus';
 
 type Props = {
@@ -11,7 +10,7 @@ type Props = {
   certsInfo?: CertsInfo[];
 };
 
-const lockIconStyle = style({ marginLeft: '5px' });
+const lockIconStyle = getKialiStyle({ marginLeft: '5px' });
 
 function showCerts(certs) {
   if (certs) {

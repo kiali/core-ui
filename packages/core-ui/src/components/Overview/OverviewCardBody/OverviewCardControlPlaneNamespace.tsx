@@ -4,7 +4,6 @@ import '../../Charts/Charts.css';
 import { SparklineChart } from '../../Charts/SparklineChart';
 import { Card, CardBody, Flex, FlexItem, Grid, GridItem, Tooltip, TooltipPosition } from '@patternfly/react-core';
 import { KialiIcon } from '../../../config/KialiIcon';
-import { style } from 'typestyle';
 import {
   ComputedServerConfig,
   Datapoint,
@@ -16,10 +15,11 @@ import {
   RichDataPoint,
   toLocaleStringWithConditionalDate,
   toVCLine,
-  VCLine
+  VCLine,
+  getKialiStyle
 } from '@kiali/types';
 
-export const infoStyle = style({
+export const infoStyle = getKialiStyle({
   margin: '0px 0px -1px 4px'
 });
 
