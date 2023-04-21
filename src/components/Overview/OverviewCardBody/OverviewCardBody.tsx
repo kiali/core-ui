@@ -119,7 +119,7 @@ const renderCharts = (
 export type OverviewCardBodyProps = {
   canaryStatus?: CanaryUpgradeStatus;
   className?: string;
-  displayMode: OverviewDisplayMode;
+  displayMode?: OverviewDisplayMode;
   direction: DirectionType;
   duration: number;
   hasCanaryUpgradeConfigured?: boolean;
@@ -138,12 +138,11 @@ export type OverviewCardBodyProps = {
   config: ComputedServerConfig;
 };
 
-//{this.state.displayMode === OverviewDisplayMode.EXPAND && this.renderCharts(ns)}
-
 export const OverviewCardBody = (props: OverviewCardBodyProps) => {
+  const display = props.displayMode ? props.displayMode : OverviewDisplayMode.EXPAND;
   return (
     <CardBody>
-      {props.istioNamespace && props.displayMode === OverviewDisplayMode.EXPAND && (
+      {props.istioNamespace && display && (
         <Grid>
           <GridItem md={props.istioAPIEnabled || props.hasCanaryUpgradeConfigured ? 3 : 6}>
             {renderLabels(props.ns, props.setDisplayMode)}
@@ -157,13 +156,13 @@ export const OverviewCardBody = (props: OverviewCardBodyProps) => {
               {props.istioAPIEnabled ? renderIstioConfigStatus(props.ns, props.linkIstio) : 'N/A'}
             </div>
             {props.ns.status && <NamespaceStatuses ns={props.ns} type={props.overviewType} />}
-            {props.displayMode === OverviewDisplayMode.EXPAND && (
+            {display === OverviewDisplayMode.EXPAND && (
               <ControlPlaneNamespaceStatus
                 outboundTrafficPolicy={props.outboundTrafficPolicy}
                 namespace={props.ns}
               ></ControlPlaneNamespaceStatus>
             )}
-            {props.displayMode === OverviewDisplayMode.EXPAND && (
+            {display === OverviewDisplayMode.EXPAND && (
               <TLSInfo
                 certificatesInformationIndicators={props.certificatesInformationIndicators}
                 version={props.certsTLSversion}
@@ -184,7 +183,7 @@ export const OverviewCardBody = (props: OverviewCardBodyProps) => {
                     props.ns,
                     props.duration,
                     props.direction,
-                    props.displayMode,
+                    display,
                     props.overviewType,
                     props.config,
                     props.istioNamespace,
@@ -197,8 +196,8 @@ export const OverviewCardBody = (props: OverviewCardBodyProps) => {
           </GridItem>
         </Grid>
       )}
-      {((!props.istioNamespace && props.displayMode === OverviewDisplayMode.EXPAND) ||
-        props.displayMode === OverviewDisplayMode.COMPACT) && (
+      {((!props.istioNamespace && display === OverviewDisplayMode.EXPAND) ||
+        Number(display) === OverviewDisplayMode.COMPACT) && (
         <>
           {renderLabels(props.ns, props.setDisplayMode)}
           <div style={{ textAlign: 'left' }}>
@@ -211,12 +210,12 @@ export const OverviewCardBody = (props: OverviewCardBodyProps) => {
             {props.istioAPIEnabled ? renderIstioConfigStatus(props.ns) : 'N/A'}
           </div>
           <NamespaceStatuses ns={props.ns} type={props.overviewType} />
-          {props.displayMode === OverviewDisplayMode.EXPAND &&
+          {display === OverviewDisplayMode.EXPAND &&
             renderCharts(
               props.ns,
               props.duration,
               props.direction,
-              props.displayMode,
+              display,
               props.overviewType,
               props.config,
               props.istioNamespace,
