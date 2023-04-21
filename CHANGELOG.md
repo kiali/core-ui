@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 0.13.0 - 2023-04-21
+
 ## 0.12.0 - 2023-04-14
 
 ## 0.11.0 - 2023-04-13
