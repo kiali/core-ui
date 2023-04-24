@@ -21,7 +21,7 @@ Assuming your working directory tree is:
 |- core-ui
 ```
 
-Before linking core-ui library, react and react-dom dependencies from application ui need to be linked to use same version in both places.
+Before linking core-ui and types libraries, react and react-dom dependencies from application ui need to be linked to use same version in both places.
 
 ```sh
 cd work/application-ui
@@ -43,45 +43,52 @@ yarn link
 Then core-ui library link is created and use react and react-dom links in the library.
 
 ```sh
-cd work/core-ui
-# Create link for core-ui
-yarn link
-
 # Install core-ui library dependencies
 yarn install
 
+cd work/core-ui/packages/core-ui
 # Link react library
 yarn link react
 
 # Link react-dom library
 yarn link react-dom
+
+# Create link for core-ui
+yarn link
+
+cd work/core-ui/packages/types
+# Create link for core-ui
+yarn link
 ```
 
 Finally use core-ui link in the application.
 
 ```sh
 cd work/application-ui
-# Link core-ui library
+# Link core-ui and types libraries
 yarn link @kiali/core-ui
+yarn link @kiali/types
 ```
 
 After testing Kiali core components, you should remove the links:
 
 ```sh
 cd work/application-ui
-# Unlink core-ui library
+# Unlink core-ui and types libraries
 yarn unlink @kiali/core-ui
+yarn unlink @kiali/types
 
 # Reinstalling application-ui dependencies
 yarn install
 
-cd work/core-ui
+cd work/core-ui/packages/core-ui
 # Unlink react library
 yarn unlink react
 
 # Unlink react-dom library
 yarn unlink react-dom
 
+cd work/core-ui
 # Reinstalling core-ui dependencies
 yarn install
 ```
