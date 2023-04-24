@@ -7,7 +7,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "yarn build:core-ui && yarn build:types",
+    "build": "yarn build:types && yarn build:core-ui",
     "build:core-ui": "yarn workspace @kiali/core-ui build",
     "build:types": "yarn workspace @kiali/types build",
     "test": "yarn workspace @kiali/core-ui test",
