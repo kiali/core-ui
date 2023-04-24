@@ -7,10 +7,10 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "yarn build:types && yarn build:core-ui",
+    "build": "yarn workspaces run build",
     "build:core-ui": "yarn workspace @kiali/core-ui build",
     "build:types": "yarn workspace @kiali/types build",
-    "test": "yarn workspace @kiali/core-ui test",
+    "test": "yarn workspaces run test",
     "lint": "eslint --ext js,ts,tsx packages/**/src",
     "lint:precommit": "if git diff --name-only HEAD | grep -E '\\.tsx?$'; then npm run lint; else true; fi",
     "lint:fix": "eslint --ext js,ts,tsx --fix packages/**/src",
