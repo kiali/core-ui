@@ -23,7 +23,8 @@ module.exports = {
   },
   extensionsToTreatAsEsm: ['.ts', '.tsx'],
   moduleNameMapper: {
-    '\\.(css|less)$': '<rootDir>/src/__mocks__/styleMock.cjs'
+    '\\.(css|less)$': '<rootDir>/src/__mocks__/styleMock.cjs',
+    '@kiali/types': '<rootDir>/../types/lib/index.esm.js'
   },
   modulePathIgnorePatterns: ['<rootDir>/lib/']
 };
