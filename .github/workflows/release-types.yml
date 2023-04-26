@@ -19,13 +19,13 @@ jobs:
     name: Initialize
     runs-on: ubuntu-20.04
     outputs:
-      release_types: ${{ env.release_types }}
-      target_branch: ${{ env.target_branch }}
+      release_types: ${{ inputs.release_types }}
+      target_branch: ${{ inputs.target_branch }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
       with:
-        ref: ${{ github.event.inputs.target_branch || github.ref_name }}
+        ref: ${{ inputs.target_branch || github.ref_name }}
         token: ${{ secrets.KIALI_PROJECT_TOKEN || github.token }}
     - name: Configure git
       run: |
@@ -41,15 +41,15 @@ jobs:
       working-directory: ./packages/types
       run: yarn install && yarn build    
     - name: Major release
-      if: "${{ github.event.inputs.release_types == 'major' }}"
+      if: "${{ inputs.release_types == 'major' }}"
       working-directory: ./packages/types
       run: yarn version --major --no-git-tag-version
     - name: Minor release
-      if: "${{ github.event.inputs.release_types == 'minor' }}"
+      if: "${{ inputs.release_types == 'minor' }}"
       working-directory: ./packages/types
       run: yarn version --minor --no-git-tag-version
     - name: Patch release
-      if: "${{ github.event.inputs.release_types == 'patch' }}"
+      if: "${{ v == 'patch' }}"
       working-directory: ./packages/types
       run: yarn version --patch --no-git-tag-version
     - name: Get version 
