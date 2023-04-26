@@ -1,10 +1,13 @@
 name: Release
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
-      release_type:
-        description: Release type
+      release_core_ui:
+        description: Release Core-UI
         required: true
         default: "minor"
         type: choice
@@ -12,7 +15,16 @@ on:
         - major
         - minor
         - patch
-      release_branch:
+      release_types:
+        description: Release type
+        required: true
+        default: "minor"
+        type: choice
+        options:
+        - major
+        - minor
+        - patch  
+      target_branch:
         description: Branch to release
         required: true
         default: main
@@ -24,71 +36,46 @@ permissions:
 
 jobs:
   initialize:
-    name: Initialize
     runs-on: ubuntu-20.04
     outputs:
-      release_type: ${{ env.release_type }}
-      release_branch: ${{ env.release_version }}
+      release_types: ${{ env.release_types }}
+      release_core_ui: ${{ env.release_core_ui }}
+      target_branch: ${{ env.target_branch }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
       with:
-        ref: ${{ github.event.inputs.release_branch || github.ref_name }}
+        ref: ${{ github.event.inputs.target_branch || github.ref_name }}
         token: ${{ secrets.KIALI_PROJECT_TOKEN || github.token }}
-    - name: Configure git
+    - name: check modified files
+      id: check_files
       run: |
-        git config user.email 'kialiProject@gmail.com'
-        git config user.name 'kialiProject'
-    - name: Setup node
-      uses: actions/setup-node@v3
-      with:
-        node-version: "14"
-        cache: yarn
-        cache-dependency-path: yarn.lock
-    - name: Install dependencies and build 🔧
-      run: yarn install && yarn build    
-    - name: Major release
-      if: "${{ github.event.inputs.release_type == 'major' }}"
-      run: yarn version --major --no-git-tag-version
-    - name: Minor release
-      if: "${{ github.event.inputs.release_type == 'minor' }}"
-      run: yarn version --minor --no-git-tag-version
-    - name: Patch release
-      if: "${{ github.event.inputs.release_type == 'patch' }}"
-      run: yarn version --patch --no-git-tag-version
-    - name: Get version 
-      run : |
-        echo "NEW_VERSION=$(cat package.json | jq -r '.version')" >> $GITHUB_ENV
-    - name: Update changelog
-      uses: superfaceai/release-changelog-action@v1
-      with:
-        path-to-changelog: CHANGELOG.md
-        version: ${{ env.NEW_VERSION }}
-        operation: release          
-    - name: Publish package 📦
-      run: |
-        echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-        npm publish --no-verify-access
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-    - name: Push changes to repository
-      run: |
-        git add "package.json"
-        git add "CHANGELOG.md"
-        git commit -m "chore: release ${{ env.NEW_VERSION }}"
-        git tag ${{ env.NEW_VERSION }}  
-        git push origin && git push --tags
-    # Read version changelog
-    - id: get-changelog
-      name: Get version changelog
-      uses: superfaceai/release-changelog-action@v1
-      with:
-        path-to-changelog: CHANGELOG.md
-        version: ${{ env.NEW_VERSION }}
-        operation: read    
-    # Update GitHub release with changelog
-    - name: Update GitHub release documentation
-      uses: softprops/action-gh-release@v1
-      with:
-        tag_name: ${{ env.NEW_VERSION }}
-        body: ${{ steps.get-changelog.outputs.changelog }}
+        echo "=============== list modified files ==============="
+        git diff --name-only HEAD^ HEAD
+        
+        echo "========== check paths of modified files =========="
+        git diff --name-only HEAD^ HEAD &gt; files.txt
+        while IFS= read -r file
+        do
+          echo $file
+          if [[ $file != packages/types/* ]]; then
+            echo "This modified file is not under the 'types' folder."
+            echo "::set-output name=run_job::false"
+            break
+          else
+            echo "::set-output name=run_job::true"
+          fi
+        done &lt; files.txt  
+  publish_types:
+    needs: [initialize]
+    if: needs.check.outputs.run_job == 'true'    
+    uses: ./.github/workflows/release-types.yml
+    with:
+      target_branch: ${{ github.event.inputs.target_branch || github.ref_name }}
+      release_types: ${{ github.event.inputs.release_types || github.ref_name }}
+  publish_core_ui:
+    needs: [initialize, publish_types]    
+    uses: ./.github/workflows/release-core-ui.yml
+    with:
+      target_branch: ${{ github.event.inputs.target_branch || github.ref_name }}
+      release_core_ui: ${{ github.event.inputs.release_core_ui || github.ref_name }}
