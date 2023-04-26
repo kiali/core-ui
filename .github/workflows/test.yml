@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [main, "^v\\d+\\.\\d+$"]
 
-jobs: 
+jobs:
   test:
     name: Test and coverage
     runs-on: ubuntu-20.04
@@ -14,24 +14,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          ref: ${{ inputs.build_branch }}   
+          ref: ${{ inputs.build_branch }}
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: "14"
+          node-version: '14'
           cache: yarn
-          cache-dependency-path: ./yarn.lock        
+          cache-dependency-path: ./yarn.lock
       - name: Install
         run: yarn install
       - name: Linter
-        run: yarn lint  
-      - name: Run test and coverage      
-        run: yarn test && yarn badges
-      - name: Push badges
-        if: ${{ github.ref == 'ref/heads/main' }}
-        run: |
-          git config user.email 'kiali-dev@googlegroups.com'
-          git config user.name 'kiali-bot'
-          git add --force .badges/*
-          git commit -m "Update badges"
-          git push     
+        run: yarn lint
+      - name: Build types
+        run: yarn build:types
+      - name: Run test and coverage
+        run: yarn test
