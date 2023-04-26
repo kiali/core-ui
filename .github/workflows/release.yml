@@ -2,8 +2,9 @@ name: Release
 
 on:
   push:
-    branches:
-      - main
+    paths:
+      - packages/types/**
+      - packages/core-ui/**
   workflow_dispatch:
     inputs:
       release_core_ui:
