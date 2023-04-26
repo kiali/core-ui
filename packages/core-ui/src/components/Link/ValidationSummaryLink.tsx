@@ -10,7 +10,7 @@ type Props = {
   link?: string;
 };
 
-class ValidationSummaryLink extends React.Component<Props> {
+export class ValidationSummaryLink extends React.Component<Props> {
   hasIstioObjects = () => {
     return this.props.objectCount && this.props.objectCount > 0;
   };
@@ -36,5 +36,3 @@ class ValidationSummaryLink extends React.Component<Props> {
     return link;
   }
 }
-
-export default ValidationSummaryLink;
