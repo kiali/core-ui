@@ -52,28 +52,28 @@ jobs:
       run: |
         if [ -z ${{ github.event.inputs.release_types }} ];
         then
-          echo "release_types=minor" >> $GITHUB_ENV 
+          echo "RELEASE_TYPES=minor" >> $GITHUB_ENV 
         else
-          echo "release_types=${{ github.event.inputs.release_type }}" >> $GITHUB_ENV 
+          echo "RELEASE_TYPES=${{ github.event.inputs.release_type }}" >> $GITHUB_ENV 
         fi
     - name: Determine release core
       id: release_core    
       run: |
         if [ -z ${{ github.event.inputs.release_types }} ];
         then
-          echo "release_core_ui=minor" >> $GITHUB_ENV 
+          echo "RELEASE_CORE_UI=minor" >> $GITHUB_ENV 
         else
-          echo "release_core_ui=${{ github.event.inputs.release_core_ui }}" >> $GITHUB_ENV 
+          echo "RELEASE_CORE_UI=${{ github.event.inputs.release_core_ui }}" >> $GITHUB_ENV 
         fi    
   publish_types:
     needs: [initialize] 
     uses: ./.github/workflows/release-types.yml
     with:
       target_branch: ${{ needs.initialize.outputs.target_branch }}
-      release_types: ${{ env.release_types }}
+      release_types: ${{ env.RELEASE_TYPES }}
   publish_core_ui:
     needs: [initialize, publish_types]    
     uses: ./.github/workflows/release-core-ui.yml
     with:
       target_branch: ${{ needs.initialize.outputs.target_branch }}
-      release_core_ui: ${{ env.release_core_ui }}
+      release_core_ui: ${{ env.RELEASE_CORE_UI }}
