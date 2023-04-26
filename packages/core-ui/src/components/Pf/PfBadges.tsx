@@ -1,7 +1,7 @@
 import React from 'react';
 import { PFColors } from '@kiali/types';
-import { getKialiStyle } from '@kiali/core-ui';
 import { Badge, Tooltip, TooltipPosition } from '@patternfly/react-core';
+import { getKialiStyle } from '../../utils/StyleUtils';
 
 export type PFBadgeType = {
   badge: string;

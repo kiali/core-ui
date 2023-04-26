@@ -1,8 +1,9 @@
 import * as React from 'react';
-import { ValidationTypes, getKialiStyle } from '@kiali/types';
+import { ValidationTypes } from '@kiali/types';
 import { Text, TextVariants, Tooltip, TooltipPosition } from '@patternfly/react-core';
 import { Validation } from './Validation';
 import { severitySummary, ValidationSummaryProps } from './Helper';
+import { getKialiStyle } from '../../utils/StyleUtils';
 
 const tooltipListStyle = getKialiStyle({
   textAlign: 'left',

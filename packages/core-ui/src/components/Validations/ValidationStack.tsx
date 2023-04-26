@@ -1,7 +1,8 @@
 import React from 'react';
-import { highestSeverity, ObjectCheck, PFColors, ValidationTypes, getKialiStyle } from '@kiali/types';
+import { highestSeverity, ObjectCheck, PFColors, ValidationTypes } from '@kiali/types';
 import { Validation } from './Validation';
 import { Stack, StackItem, Text, TextVariants } from '@patternfly/react-core';
+import { getKialiStyle } from '../../utils/StyleUtils';
 
 type Props = {
   checks?: ObjectCheck[];

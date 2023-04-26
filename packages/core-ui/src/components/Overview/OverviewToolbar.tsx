@@ -28,13 +28,13 @@ import {
   FilterType,
   SortField,
   PFColors,
-  ComputedServerConfig,
-  getKialiStyle
+  ComputedServerConfig
 } from '@kiali/types';
 import { availableFilters, LabelFilters } from './OverviewToolbar/';
 import { ToolbarDropdown } from '../ToolbarDropwdown/ToolbarDropdown';
 import { TimeDurationComponent } from '../Time/TimeDurationComponent';
 import * as Sorts from './Sorts';
+import { getKialiStyle } from '../../utils/StyleUtils';
 
 export enum OverviewDisplayMode {
   COMPACT,

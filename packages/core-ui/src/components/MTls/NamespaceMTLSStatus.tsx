@@ -2,7 +2,8 @@ import * as React from 'react';
 
 import { MTLSIconTypes } from './MTLSIcon';
 import { default as MTLSStatus, emptyDescriptor, StatusDescriptor } from './MTLSStatus';
-import { MTLSStatuses, getKialiStyle } from '@kiali/types';
+import { MTLSStatuses } from '@kiali/types';
+import { getKialiStyle } from '../../utils/StyleUtils';
 
 type Props = {
   status: string;

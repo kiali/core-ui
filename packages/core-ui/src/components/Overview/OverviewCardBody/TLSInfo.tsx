@@ -1,8 +1,9 @@
 import { Label, Tooltip, TooltipPosition } from '@patternfly/react-core';
 import { KialiIcon } from '../../../config/KialiIcon';
 import * as React from 'react';
-import { CertsInfo, getKialiStyle } from '@kiali/types';
+import { CertsInfo } from '@kiali/types';
 import { infoStyle } from './ControlPlaneNamespaceStatus';
+import { getKialiStyle } from '../../../utils/StyleUtils';
 
 type Props = {
   certificatesInformationIndicators?: boolean;

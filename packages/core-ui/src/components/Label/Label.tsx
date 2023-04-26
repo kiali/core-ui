@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Label as PfLabel } from '@patternfly/react-core';
-import { canRender, getKialiStyle } from '@kiali/types';
+import { canRender } from '@kiali/types';
+import { getKialiStyle } from '../../utils/StyleUtils';
 
 interface Props {
   name: string;

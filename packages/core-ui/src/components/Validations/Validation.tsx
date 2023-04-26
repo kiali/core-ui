@@ -8,7 +8,7 @@ import {
 import { Text, TextVariants } from '@patternfly/react-core';
 import { SVGIconProps } from '@patternfly/react-icons/dist/js/createIcon';
 import { PFColors, ValidationTypes } from '@kiali/types';
-import { getKialiStyle } from '../../utils';
+import { getKialiStyle } from '../../utils/StyleUtils';
 
 const validationStyle = getKialiStyle({
   textAlign: 'left',

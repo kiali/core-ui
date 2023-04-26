@@ -15,9 +15,9 @@ import {
   RichDataPoint,
   toLocaleStringWithConditionalDate,
   toVCLine,
-  VCLine,
-  getKialiStyle
+  VCLine
 } from '@kiali/types';
+import { getKialiStyle } from '../../../utils/StyleUtils';
 
 export const infoStyle = getKialiStyle({
   margin: '0px 0px -1px 4px'

@@ -1,8 +1,9 @@
 import { CardHeader, CardHeaderMain, Label, Title, TitleSizes } from '@patternfly/react-core';
 import { ControlPlaneBadge } from './ControlPlaneBadge';
 import { ControlPlaneVersionBadge } from './ControlPlaneVersionBadge';
-import { CanaryUpgradeStatus, ComponentStatus, NamespaceInfo, getKialiStyle } from '@kiali/types';
+import { CanaryUpgradeStatus, ComponentStatus, NamespaceInfo } from '@kiali/types';
 import * as React from 'react';
+import { getKialiStyle } from '../../../utils/StyleUtils';
 
 const NS_LONG = 20;
 

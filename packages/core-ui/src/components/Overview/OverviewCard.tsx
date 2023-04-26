@@ -7,13 +7,13 @@ import {
   NamespaceInfo,
   OutboundTrafficPolicy,
   IstiodResourceThresholds,
-  ComputedServerConfig,
-  getKialiStyle
+  ComputedServerConfig
 } from '@kiali/types';
 import { DirectionType, OverviewDisplayMode, OverviewType } from './OverviewToolbar';
 import * as React from 'react';
 import { OverviewCardHeader } from './OverviewCardHeader';
 import { OverviewCardBody } from './OverviewCardBody';
+import { getKialiStyle } from '../../utils/StyleUtils';
 
 const cardControlPlaneGridStyle = getKialiStyle({
   textAlign: 'center',

@@ -11,9 +11,9 @@ import {
   HealthItem,
   HEALTHY,
   PFColors,
-  TRAFFICSTATUS,
-  getKialiStyle
+  TRAFFICSTATUS
 } from '@kiali/types';
+import { getKialiStyle } from '../../utils/StyleUtils';
 
 interface Props {
   health: Health;

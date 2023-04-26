@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Select, SelectOption, Tooltip, TooltipPosition } from '@patternfly/react-core';
-import { getKialiStyle } from '@kiali/types';
+import { getKialiStyle } from '../../utils/StyleUtils';
 
 const widthAuto = getKialiStyle({
   width: 'auto'
