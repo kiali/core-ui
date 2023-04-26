@@ -2,9 +2,8 @@ name: Release
 
 on:
   push:
-    paths:
-      - packages/types/**
-      - packages/core-ui/**
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       release_core_ui:
@@ -42,22 +41,14 @@ jobs:
       release_types: ${{ env.release_types }}
       release_core_ui: ${{ env.release_core_ui }}
       target_branch: ${{ env.target_branch }}
-      types_package_change: ${{ steps.filter.outputs.types_package_change }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
       with:
         ref: ${{ github.event.inputs.target_branch || github.ref_name }}
         token: ${{ secrets.KIALI_PROJECT_TOKEN || github.token }}
-    - uses: dorny/paths-filter@v2
-      id: filter
-      with:
-        filters: |
-          types_package_change:
-            - '.packages/types/**'
   publish_types:
-    needs: [initialize]
-    if: needs.initialize.outputs.types_package_change == 'true'   
+    needs: [initialize] 
     uses: ./.github/workflows/release-types.yml
     with:
       target_branch: ${{ github.event.inputs.target_branch || github.ref_name }}
