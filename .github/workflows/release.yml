@@ -45,17 +45,17 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
       with:
-        ref: ${{ github.event.inputs.target_branch || github.ref_name }}
+        ref: ${{ needs.initialize.outputs.target_branch }}
         token: ${{ secrets.KIALI_PROJECT_TOKEN || github.token }}
   publish_types:
     needs: [initialize] 
     uses: ./.github/workflows/release-types.yml
     with:
-      target_branch: ${{ github.event.inputs.target_branch || github.ref_name }}
-      release_types: ${{ github.event.inputs.release_types }}
+      target_branch: ${{ needs.initialize.outputs.target_branch }}
+      release_types: ${{ needs.initialize.outputs.release_types }}
   publish_core_ui:
     needs: [initialize, publish_types]    
     uses: ./.github/workflows/release-core-ui.yml
     with:
-      target_branch: ${{ github.event.inputs.target_branch || github.ref_name }}
-      release_core_ui: ${{ github.event.inputs.release_core_ui }}
+      target_branch: ${{ needs.initialize.outputs.target_branch }}
+      release_core_ui: ${{ needs.initialize.outputs.release_core_ui }}
