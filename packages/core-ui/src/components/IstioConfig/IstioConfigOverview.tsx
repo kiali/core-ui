@@ -34,7 +34,6 @@ interface IstioConfigOverviewProps {
   workloadReferences: WorkloadReference[];
   helpMessages?: HelpMessage[];
   selectedLine?: string;
-  // kiosk: string;
   istioAPIEnabled: boolean;
   linkTemplate: (name: string, namespace: string, objectType: string) => JSX.Element;
 }

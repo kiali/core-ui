@@ -1,10 +1,6 @@
 import { Stack, StackItem, Title, TitleSizes } from '@patternfly/react-core';
 import * as React from 'react';
-<<<<<<< HEAD:packages/core-ui/src/components/IstioConfig/IstioConfigReferences.tsx
 import { ObjectReference, ServiceReference, WorkloadReference } from '@kiali/types';
-=======
-import { ObjectReference, ServiceReference, WorkloadReference } from '../../types/IstioObjects';
->>>>>>> 21ce4d7 (Fix lint errors and enable linkTemplate):src/components/IstioConfig/IstioConfigReferences.tsx
 
 interface IstioConfigReferencesProps {
   objectReferences: ObjectReference[];
