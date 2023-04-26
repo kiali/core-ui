@@ -49,7 +49,7 @@ jobs:
       working-directory: ./packages/types
       run: yarn version --minor --no-git-tag-version
     - name: Patch release
-      if: "${{ v == 'patch' }}"
+      if: "${{ inputs.release_types == 'patch' }}"
       working-directory: ./packages/types
       run: yarn version --patch --no-git-tag-version
     - name: Get version 
