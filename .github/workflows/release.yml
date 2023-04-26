@@ -41,34 +41,22 @@ jobs:
       release_types: ${{ env.release_types }}
       release_core_ui: ${{ env.release_core_ui }}
       target_branch: ${{ env.target_branch }}
+      types_package_change: ${{ steps.filter.outputs.types_package_change }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
       with:
         ref: ${{ github.event.inputs.target_branch || github.ref_name }}
         token: ${{ secrets.KIALI_PROJECT_TOKEN || github.token }}
-    - name: check modified files
-      id: check_files
-      run: |
-        echo "=============== list modified files ==============="
-        git diff --name-only HEAD^ HEAD
-        
-        echo "========== check paths of modified files =========="
-        git diff --name-only HEAD^ HEAD &gt; files.txt
-        while IFS= read -r file
-        do
-          echo $file
-          if [[ $file != packages/types/* ]]; then
-            echo "This modified file is not under the 'types' folder."
-            echo "::set-output name=run_job::false"
-            break
-          else
-            echo "::set-output name=run_job::true"
-          fi
-        done &lt; files.txt  
+    - uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        filters: |
+          types_package_change:
+            - '.packages/types/**'
   publish_types:
     needs: [initialize]
-    if: needs.check.outputs.run_job == 'true'    
+    if: needs.initialize.outputs.types_package_change == 'true'   
     uses: ./.github/workflows/release-types.yml
     with:
       target_branch: ${{ github.event.inputs.target_branch || github.ref_name }}
