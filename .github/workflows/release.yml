@@ -52,10 +52,10 @@ jobs:
     uses: ./.github/workflows/release-types.yml
     with:
       target_branch: ${{ github.event.inputs.target_branch || github.ref_name }}
-      release_types: ${{ github.event.inputs.release_types || "minor" }}
+      release_types: ${{ github.event.inputs.release_types }}
   publish_core_ui:
     needs: [initialize, publish_types]    
     uses: ./.github/workflows/release-core-ui.yml
     with:
       target_branch: ${{ github.event.inputs.target_branch || github.ref_name }}
-      release_core_ui: ${{ github.event.inputs.release_core_ui || "minor" }}
+      release_core_ui: ${{ github.event.inputs.release_core_ui }}
