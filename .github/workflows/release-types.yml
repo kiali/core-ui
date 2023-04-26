@@ -36,7 +36,7 @@ jobs:
       with:
         node-version: "14"
         cache: yarn
-        cache-dependency-path: packages/types/yarn.lock
+        cache-dependency-path: yarn.lock
     - name: Install dependencies and build 🔧
       working-directory: ./packages/types
       run: yarn install && yarn build    
