@@ -36,7 +36,7 @@ jobs:
       with:
         node-version: "14"
         cache: yarn
-        cache-dependency-path: packages/core-ui/yarn.lock
+        cache-dependency-path: yarn.lock
     - name: Get Types package version
       working-directory: ./packages/types
       run: echo "TYPES_VERSION=$(cat package.json | jq -r '.version')" >> $GITHUB_ENV  
