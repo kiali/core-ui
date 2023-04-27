@@ -1,5 +1,5 @@
 import { Label } from '@patternfly/react-core';
-import React from 'react';
+import * as React from 'react';
 
 export type ControlPlaneVersionBadgeProps = {
   version: string;
