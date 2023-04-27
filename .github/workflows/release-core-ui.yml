@@ -22,57 +22,57 @@ jobs:
       release_core_ui: ${{ inputs.release_core_ui }}
       target_branch: ${{ inputs.target_branch }}
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-      with:
-        ref: ${{ github.event.inputs.target_branch || github.ref_name }}
-        token: ${{ secrets.KIALI_PROJECT_TOKEN || github.token }}
-    - name: Configure git
-      run: |
-        git config user.email 'kialiProject@gmail.com'
-        git config user.name 'kialiProject'
-    - name: Setup node
-      uses: actions/setup-node@v3
-      with:
-        node-version: "14"
-        cache: yarn
-        cache-dependency-path: yarn.lock
-    - name: Get Types package version
-      working-directory: ./packages/types
-      run: echo "TYPES_VERSION=$(cat package.json | jq -r '.version')" >> $GITHUB_ENV  
-    - name: Update package core-ui with new types version
-      working-directory: ./packages/core-ui
-      run: yarn upgrade @kiali/types@$TYPES_VERSION
-    - name: Install dependencies and build 🔧
-      working-directory: ./packages/core-ui
-      run: yarn install && yarn build    
-    - name: Major release
-      if: "${{ inputs.release_core_ui == 'major' }}"
-      working-directory: ./packages/core-ui
-      run: yarn version --major --no-git-tag-version
-    - name: Minor release
-      if: "${{ inputs.release_core_ui == 'minor' }}"
-      working-directory: ./packages/core-ui
-      run: yarn version --minor --no-git-tag-version
-    - name: Patch release
-      if: "${{ inputs.release_core_ui == 'patch' }}"
-      working-directory: ./packages/core-ui
-      run: yarn version --patch --no-git-tag-version
-    - name: Get version 
-      working-directory: ./packages/core-ui
-      run : |
-        echo "NEW_VERSION=$(cat package.json | jq -r '.version')" >> $GITHUB_ENV          
-    - name: Publish package 📦
-      working-directory: ./packages/core-ui
-      run: |
-        echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-        npm publish --no-verify-access
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-    - name: Push changes to repository
-      working-directory: ./packages/core-ui
-      run: |
-        git add "package.json"  
-        git commit -m "chore: release ${{ env.NEW_VERSION }}"
-        git tag ${{ env.NEW_VERSION }}  
-        git push origin && git push --tags
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.target_branch || github.ref_name }}
+          token: ${{ secrets.KIALI_PROJECT_TOKEN || github.token }}
+      - name: Configure git
+        run: |
+          git config user.email 'kialiProject@gmail.com'
+          git config user.name 'kialiProject'
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '14'
+          cache: yarn
+          cache-dependency-path: yarn.lock
+      - name: Get Types package version
+        working-directory: ./packages/types
+        run: echo "TYPES_VERSION=$(cat package.json | jq -r '.version')" >> $GITHUB_ENV
+      - name: Update package core-ui with new types version
+        working-directory: ./packages/core-ui
+        run: yarn upgrade @kiali/types@$TYPES_VERSION
+      - name: Install dependencies and build 🔧
+        working-directory: ./packages/core-ui
+        run: yarn install && yarn build
+      - name: Major release
+        if: "${{ inputs.release_core_ui == 'major' }}"
+        working-directory: ./packages/core-ui
+        run: yarn version --major --no-git-tag-version
+      - name: Minor release
+        if: "${{ inputs.release_core_ui == 'minor' }}"
+        working-directory: ./packages/core-ui
+        run: yarn version --minor --no-git-tag-version
+      - name: Patch release
+        if: "${{ inputs.release_core_ui == 'patch' }}"
+        working-directory: ./packages/core-ui
+        run: yarn version --patch --no-git-tag-version
+      - name: Get version
+        working-directory: ./packages/core-ui
+        run: |
+          echo "NEW_VERSION=$(cat package.json | jq -r '.version')" >> $GITHUB_ENV
+      - name: Publish package 📦
+        working-directory: ./packages/core-ui
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+          npm publish --no-verify-access
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Push changes to repository
+        working-directory: ./packages/core-ui
+        run: |
+          git add "package.json"  
+          git commit -m "chore: release ${{ $NEW_VERSION }}"
+          git tag ${{ $NEW_VERSION }}  
+          git push origin && git push --tags

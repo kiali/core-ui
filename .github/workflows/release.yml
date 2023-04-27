@@ -9,21 +9,21 @@ on:
       release_core_ui:
         description: Release Core-UI
         required: true
-        default: "minor"
+        default: 'minor'
         type: choice
         options:
-        - major
-        - minor
-        - patch
+          - major
+          - minor
+          - patch
       release_types:
         description: Release type
         required: true
-        default: "minor"
+        default: 'minor'
         type: choice
         options:
-        - major
-        - minor
-        - patch  
+          - major
+          - minor
+          - patch
       target_branch:
         description: Branch to release
         required: true
@@ -38,42 +38,42 @@ jobs:
   initialize:
     runs-on: ubuntu-20.04
     outputs:
-      release_types: ${{ env.release_types }}
-      release_core_ui: ${{ env.release_core_ui }}
-      target_branch: ${{ env.target_branch || github.ref_name }}
+      release_types: ${{ steps.release_types.outputs.release_types }}
+      release_core_ui: ${{ steps.release_core.outputs.release_core_ui }}
+      target_branch: ${{ github.event.inputs.target_branch || github.ref_name }}
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-      with:
-        ref: ${{ needs.initialize.outputs.target_branch }}
-        token: ${{ secrets.KIALI_PROJECT_TOKEN || github.token }}
-    - name: Determine release type
-      id: release_types    
-      run: |
-        if [ -z ${{ github.event.inputs.release_types }} ];
-        then
-          echo "RELEASE_TYPES=minor" >> $GITHUB_ENV 
-        else
-          echo "RELEASE_TYPES=${{ github.event.inputs.release_type }}" >> $GITHUB_ENV 
-        fi
-    - name: Determine release core
-      id: release_core    
-      run: |
-        if [ -z ${{ github.event.inputs.release_types }} ];
-        then
-          echo "RELEASE_CORE_UI=minor" >> $GITHUB_ENV 
-        else
-          echo "RELEASE_CORE_UI=${{ github.event.inputs.release_core_ui }}" >> $GITHUB_ENV 
-        fi    
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ needs.initialize.outputs.target_branch }}
+          token: ${{ secrets.KIALI_PROJECT_TOKEN || github.token }}
+      - name: Determine release type
+        id: release_types
+        run: |
+          if [ -z ${{ github.event.inputs.release_types }} ];
+          then
+            echo "release_types=minor" >> $GITHUB_OUTPUT 
+          else
+            echo "release_types=${{ github.event.inputs.release_type }}" >> $GITHUB_OUTPUT 
+          fi
+      - name: Determine release core
+        id: release_core
+        run: |
+          if [ -z ${{ github.event.inputs.release_core_ui }} ];
+          then
+            echo "release_core_ui=minor" >> $GITHUB_OUTPUT 
+          else
+            echo "release_core_ui=${{ github.event.inputs.release_core_ui }}" >> $GITHUB_OUTPUT 
+          fi
   publish_types:
-    needs: [initialize] 
+    needs: [initialize]
     uses: ./.github/workflows/release-types.yml
     with:
       target_branch: ${{ needs.initialize.outputs.target_branch }}
-      release_types: ${{ env.RELEASE_TYPES }}
+      release_types: ${{ needs.initialize.outputs.release_types }}
   publish_core_ui:
-    needs: [initialize, publish_types]    
+    needs: [initialize, publish_types]
     uses: ./.github/workflows/release-core-ui.yml
     with:
       target_branch: ${{ needs.initialize.outputs.target_branch }}
-      release_core_ui: ${{ env.RELEASE_CORE_UI }}
+      release_core_ui: ${{ needs.initialize.outputs.release_core_ui }}
