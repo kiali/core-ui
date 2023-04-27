@@ -1,21 +1,9 @@
 name: Release
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
     inputs:
-      release_core_ui:
-        description: Release Core-UI
-        required: true
-        default: "minor"
-        type: choice
-        options:
-        - major
-        - minor
-        - patch
-      release_types:
+      release_type:
         description: Release type
         required: true
         default: "minor"
@@ -23,8 +11,8 @@ on:
         options:
         - major
         - minor
-        - patch  
-      target_branch:
+        - patch
+      release_branch:
         description: Branch to release
         required: true
         default: main
@@ -36,44 +24,86 @@ permissions:
 
 jobs:
   initialize:
+    name: Initialize
     runs-on: ubuntu-20.04
     outputs:
-      release_types: ${{ env.release_types }}
-      release_core_ui: ${{ env.release_core_ui }}
-      target_branch: ${{ env.target_branch || github.ref_name }}
+      release_type: ${{ env.release_type }}
+      release_branch: ${{ env.release_branch }}
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
       with:
-        ref: ${{ needs.initialize.outputs.target_branch }}
+        ref: ${{ github.event.inputs.release_branch || github.ref_name }}
         token: ${{ secrets.KIALI_PROJECT_TOKEN || github.token }}
-    - name: Determine release type
-      id: release_types    
+    - name: Configure git
       run: |
-        if [ -z ${{ github.event.inputs.release_types }} ];
-        then
-          echo "RELEASE_TYPES=minor" >> $GITHUB_ENV 
-        else
-          echo "RELEASE_TYPES=${{ github.event.inputs.release_type }}" >> $GITHUB_ENV 
-        fi
-    - name: Determine release core
-      id: release_core    
+        git config user.email 'kialiProject@gmail.com'
+        git config user.name 'kialiProject'
+    - name: Setup node
+      uses: actions/setup-node@v3
+      with:
+        node-version: "14"
+        cache: yarn
+        cache-dependency-path: yarn.lock
+    - name: Install dependencies and build 🔧
+      working-directory: ./packages/types
+      run: yarn install && yarn build    
+    - name: Major release
+      if: "${{ github.event.inputs.release_type == 'major' }}"
+      working-directory: ./packages/types
+      run: yarn version --major --no-git-tag-version
+    - name: Minor release
+      if: "${{ github.event.inputs.release_type == 'minor' }}"
+      working-directory: ./packages/types
+      run: yarn version --minor --no-git-tag-version
+    - name: Patch release
+      if: "${{ github.event.inputs.release_type == 'patch' }}"
+      working-directory: ./packages/types
+      run: yarn version --patch --no-git-tag-version
+    - name: Get version Types
+      working-directory: ./packages/types
+      run : |
+        echo "NEW_VERSION=$(cat package.json | jq -r '.version')" >> $GITHUB_ENV
+    - name: Publish package types 📦
+      working-directory: ./packages/types
       run: |
-        if [ -z ${{ github.event.inputs.release_types }} ];
-        then
-          echo "RELEASE_CORE_UI=minor" >> $GITHUB_ENV 
-        else
-          echo "RELEASE_CORE_UI=${{ github.event.inputs.release_core_ui }}" >> $GITHUB_ENV 
-        fi    
-  publish_types:
-    needs: [initialize] 
-    uses: ./.github/workflows/release-types.yml
-    with:
-      target_branch: ${{ needs.initialize.outputs.target_branch }}
-      release_types: ${{ env.RELEASE_TYPES }}
-  publish_core_ui:
-    needs: [initialize, publish_types]    
-    uses: ./.github/workflows/release-core-ui.yml
-    with:
-      target_branch: ${{ needs.initialize.outputs.target_branch }}
-      release_core_ui: ${{ env.RELEASE_CORE_UI }}
+        echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+        npm publish --no-verify-access
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+    - name: Update package core-ui with new types version
+      working-directory: ./packages/core-ui
+      run: yarn upgrade @kiali/types@$NEW_VERSION    
+    - name: Install dependencies and build 🔧
+      working-directory: ./packages/core-ui
+      run: yarn install && yarn build    
+    - name: Major release
+      if: "${{ github.event.inputs.release_type == 'major' }}"
+      working-directory: ./packages/core-ui
+      run: yarn version --major --no-git-tag-version
+    - name: Minor release
+      if: "${{ github.event.inputs.release_type == 'minor' }}"
+      working-directory: ./packages/core-ui
+      run: yarn version --minor --no-git-tag-version
+    - name: Patch release
+      if: "${{ github.event.inputs.release_type == 'patch' }}"
+      working-directory: ./packages/core-ui
+      run: yarn version --patch --no-git-tag-version
+    - name: Get version Types
+      working-directory: ./packages/core-ui
+      run : |
+        echo "NEW_VERSION=$(cat package.json | jq -r '.version')" >> $GITHUB_ENV
+    - name: Publish package core-ui 📦
+      working-directory: ./packages/core-ui
+      run: |
+        echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+        npm publish --no-verify-access
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}    
+    - name: Push changes to repository 
+      run: |
+        git add "./packages/types/package.json"
+        git add "./packages/core-ui/package.json"
+        git commit -m "chore: release ${{ env.NEW_VERSION }}"
+        git tag ${{ env.NEW_VERSION }}  
+        git push origin && git push --tags
