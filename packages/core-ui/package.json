@@ -14,7 +14,7 @@
   "license": "Apache-2.0",
   "author": "Red Hat",
   "dependencies": {
-    "@kiali/types": "0.0.1",
+    "@kiali/types": "0.13.0",
     "@patternfly/patternfly": "4.179.1",
     "@patternfly/react-charts": "6.51.5",
     "@patternfly/react-core": "4.198.5",
