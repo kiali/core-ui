@@ -25,7 +25,7 @@ type ValidationProps = ValidationDescription & {
   iconStyle?: React.CSSProperties;
 };
 
-type ValidationDescription = {
+export type ValidationDescription = {
   severity: ValidationTypes;
   message?: string;
 };

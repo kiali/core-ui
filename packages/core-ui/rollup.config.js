@@ -3,6 +3,8 @@ import peerDepsExternal from 'rollup-plugin-peer-deps-external';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
+import image from '@rollup/plugin-image';
+import copy from 'rollup-plugin-copy';
 import typescript from 'rollup-plugin-typescript2';
 import postcss from 'rollup-plugin-postcss';
 
@@ -27,6 +29,12 @@ export default {
     resolve(),
     commonjs(),
     json(),
+    image(),
+    copy({
+      targets: [
+        { src: 'src/assets/*', dest: 'lib/assets' } // Adjust the source and destination paths as per your project structure
+      ]
+    }),
     typescript({ useTsconfigDeclarationDir: true }),
     postcss({
       extensions: ['.css']

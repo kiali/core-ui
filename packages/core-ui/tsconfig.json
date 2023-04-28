@@ -1,10 +1,14 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "baseUrl": ".",
     "rootDir": "src",
     "declaration": true,
     "declarationDir": "lib",
-    "lib": ["dom", "dom.iterable", "esnext"]
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "paths": {
+      "*": ["src/assets/*"]
+    }
   },
   "include": ["src"],
   "exclude": ["node_modules", "lib"]
