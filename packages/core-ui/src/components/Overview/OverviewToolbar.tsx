@@ -31,7 +31,7 @@ import {
   ComputedServerConfig
 } from '@kiali/types';
 import { availableFilters, LabelFilters } from './OverviewToolbar/';
-import { ToolbarDropdown } from '../ToolbarDropwdown/ToolbarDropdown';
+import { ToolbarDropdown } from '../ToolbarDropdown/ToolbarDropdown';
 import { TimeDurationComponent } from '../Time/TimeDurationComponent';
 import * as Sorts from './Sorts';
 import { style } from 'typestyle';

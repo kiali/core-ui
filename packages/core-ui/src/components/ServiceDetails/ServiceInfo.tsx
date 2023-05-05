@@ -18,7 +18,9 @@ import {
   k8sHTTPRouteToIstioItems,
   validationKey,
   k8sGwToIstioItems,
-  ComputedServerConfig
+  ComputedServerConfig,
+  PromisesRegistry,
+  GraphDataSource
 } from '@kiali/types';
 // import { RenderComponentScroll } from '../../components/Nav/Page';
 // import { PromisesRegistry } from 'utils/CancelablePromises';
@@ -59,8 +61,8 @@ const fullHeightStyle = style({
 });
 
 export class ServiceInfo extends React.Component<Props, ServiceInfoState> {
-  // private promises = new PromisesRegistry();
-  // private graphDataSource = new GraphDataSource();
+  private promises = new PromisesRegistry();
+  private graphDataSource = new GraphDataSource(this.props.serverConfig);
 
   constructor(props: Props) {
     super(props);
@@ -99,8 +101,8 @@ export class ServiceInfo extends React.Component<Props, ServiceInfoState> {
       return;
     }
 
-    // this.promises.cancelAll();
-    // this.graphDataSource.fetchForService(this.props.duration, this.props.namespace, this.props.service);
+    this.promises.cancelAll();
+    this.graphDataSource.fetchForService(this.props.duration, this.props.namespace, this.props.service);
   };
 
   private getServiceValidation(): ObjectValidation | undefined {

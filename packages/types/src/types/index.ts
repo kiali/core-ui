@@ -6,6 +6,7 @@ export * from './CertsInfo';
 export * from './Common';
 export * from './Dashboards';
 export * from './ErrorMsg';
+export * from './ErrorRate';
 export * from './Filters';
 export * from './GrafanaInfo';
 export * from './Graph';

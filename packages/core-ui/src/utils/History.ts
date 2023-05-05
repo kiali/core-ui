@@ -2,7 +2,7 @@ import { createBrowserHistory, createMemoryHistory, createHashHistory } from 'hi
 import { toValidDuration, BoundsInMilliseconds, ComputedServerConfig } from '@kiali/types';
 
 const webRoot = (window as any).WEB_ROOT ? (window as any).WEB_ROOT : undefined;
-const baseName = webRoot && webRoot !== '/' ? webRoot + '/console' : '/console';
+const baseName = webRoot && webRoot !== '/' ? webRoot + process.env.BASE_NAME : process.env.BASE_NAME;
 const historyMode = (window as any).HISTORY_MODE ? (window as any).HISTORY_MODE : 'browser';
 const history = process.env.TEST_RUNNER
   ? createMemoryHistory()

@@ -1,15 +1,4 @@
 import {
-  ascendingThresholdCheck,
-  ThresholdStatus,
-  RATIO_NA,
-  HEALTHY,
-  NA,
-  FAILURE,
-  DEGRADED,
-  RateHealth,
-  ToleranceConfig
-} from '../';
-import {
   CytoscapeGlobalScratchNamespace,
   DecoratedGraphEdgeData,
   DecoratedGraphNodeData,
@@ -20,6 +9,9 @@ import { aggregate, checkExpr, getRateHealthConfig, transformEdgeResponses } fro
 import { RequestTolerance } from './types';
 import { decoratedEdgeData, decoratedNodeData } from '../../utils';
 import { ComputedServerConfig } from '../../config';
+import { ascendingThresholdCheck, DEGRADED, FAILURE, HEALTHY, NA, RATIO_NA, ThresholdStatus } from '../HealthStatus';
+import { RateHealth } from '../HealthAnnotation';
+import { ToleranceConfig } from '../ServerConfig';
 
 export const assignEdgeHealth = (serverConfig: ComputedServerConfig, cy: any) => {
   const cyGlobal = cy.scratch(CytoscapeGlobalScratchNamespace);

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ToolbarDropdown } from '../ToolbarDropwdown/ToolbarDropdown';
+import { ToolbarDropdown } from '../ToolbarDropdown/ToolbarDropdown';
 import RefreshButtonContainer from './RefreshButton';
 import { TooltipPosition } from '@patternfly/react-core';
 import { config, IntervalInMilliseconds } from '@kiali/types';

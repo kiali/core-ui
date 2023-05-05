@@ -1,8 +1,11 @@
-import { Direction, NodeType, ProtocolWithTraffic, RateHealth, ThresholdStatus } from '../';
 import { ComputedServerConfig } from '../../config';
 import { aggregate, checkExpr, getRateHealthConfig, transformEdgeResponses } from './utils';
 import { calculateStatusGraph } from './GraphEdgeStatus';
-import { TrafficItem } from '../';
+import { RateHealth } from '../HealthAnnotation';
+import { TrafficItem } from '../Traffic';
+import { Direction } from '../MetricsOptions';
+import { ThresholdStatus } from '../HealthStatus';
+import { NodeType, ProtocolWithTraffic } from '../Graph';
 
 /*
  Calculate Health for DetailsTraffic

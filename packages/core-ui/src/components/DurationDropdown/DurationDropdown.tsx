@@ -1,4 +1,4 @@
-import ToolbarDropdown from '../ToolbarDropwdown/ToolbarDropdown';
+import ToolbarDropdown from '../ToolbarDropdown/ToolbarDropdown';
 import * as React from 'react';
 import { TooltipPosition } from '@patternfly/react-core';
 import { ComputedServerConfig, DurationInSeconds, humanDurations } from '@kiali/types';
