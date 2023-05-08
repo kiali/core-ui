@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { Card, CardBody, Tab, Tabs, Toolbar, ToolbarGroup, ToolbarItem, Tooltip } from '@patternfly/react-core';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
+import { AxiosError } from 'axios';
+import { setTraceId as setURLTraceId } from '../../utils/SearchParamUtils';
 // import * as AlertUtils from 'utils/AlertUtils';
 // import { RenderComponentScroll } from '../Nav/Page';
 // import { KioskElement } from '../Kiosk/KioskElement';
@@ -19,13 +21,23 @@ import {
   getMetricsStats,
   genStatsKey,
   Direction,
-  MetricsStatsResult
+  MetricsStatsResult,
+  statsQueryToKey,
+  MetricsStats,
+  MetricsStatsState,
+  transformTraceData,
+  getJaegerTrace,
+  reduceMetricsStats,
+  StatsMatrix,
+  ComputedServerConfig
 } from '@kiali/types';
 import { TracesFetcher, FetchOptions } from './TracesFetcher';
 // import { timeRangeSelector } from 'store/Selectors';
 import { TracesDisplayOptions, QuerySettings, DisplaySettings, percentilesOptions } from './TracesDisplayOptions';
 import { getSpanId } from '../../utils/SearchParamUtils';
 import { JaegerScatter } from './JaegerScatter';
+import { TraceDetails } from './JaegerResults/TraceDetails';
+import { SpanDetails } from './JaegerResults/SpanDetails';
 
 // type ReduxProps = {
 //   namespaceSelector: boolean;
@@ -33,6 +45,8 @@ import { JaegerScatter } from './JaegerScatter';
 //   timeRange: TimeRange;
 //   urlJaeger: string;
 // };
+
+type ExpiringStats = MetricsStats & { timestamp: number };
 
 type TracesProps = {
   lastRefreshAt: TimeInMilliseconds;
@@ -42,7 +56,7 @@ type TracesProps = {
   targetKind: TargetKind;
   timeRange: TimeRange;
   jaegerInfo: JaegerInfo;
-  selectedTrace?: JaegerTrace;
+  serverConfig: ComputedServerConfig;
 };
 
 interface TracesState {
@@ -56,6 +70,10 @@ interface TracesState {
   targetApp?: string;
   activeTab: number;
   toolbarDisabled: boolean;
+  metricsStats: MetricsStatsState;
+  selectedTrace?: JaegerTrace;
+  statsMatrix?: StatsMatrix;
+  isStatsMatrixComplete: boolean;
 }
 
 const traceDetailsTab = 0;
@@ -83,7 +101,10 @@ export class TracesComponent extends React.Component<TracesProps, TracesState> {
       jaegerErrors: [],
       targetApp: targetApp,
       activeTab: getSpanId() ? spansDetailsTab : traceDetailsTab,
-      toolbarDisabled: false
+      toolbarDisabled: false,
+      metricsStats: { data: new Map() },
+      selectedTrace: undefined,
+      isStatsMatrixComplete: false
     };
     this.fetcher = new TracesFetcher(this.onTracesUpdated, errors => {
       // If there was traces displayed already, do not hide them so that the user can still interact with them
@@ -104,15 +125,15 @@ export class TracesComponent extends React.Component<TracesProps, TracesState> {
   componentDidUpdate(prevProps: TracesProps) {
     // Selected trace (coming from redux) might have been reloaded and needs to be updated within the traces list
     // Check reference of selected trace
-    if (this.props.selectedTrace && prevProps.selectedTrace !== this.props.selectedTrace) {
-      const traces = this.state.traces;
-      const trace = this.props.selectedTrace;
-      const index = traces.findIndex(t => t.traceID === trace.traceID);
-      if (index >= 0) {
-        traces[index] = this.props.selectedTrace;
-        this.setState({ traces: traces });
-      }
-    }
+    // if (this.props.selectedTrace && prevProps.selectedTrace !== this.props.selectedTrace) {
+    //   const traces = this.state.traces;
+    //   const trace = this.props.selectedTrace;
+    //   const index = traces.findIndex(t => t.traceID === trace.traceID);
+    //   if (index >= 0) {
+    //     traces[index] = this.props.selectedTrace;
+    //     this.setState({ traces: traces });
+    //   }
+    // }
 
     const changedTimeRange = !isEqualTimeRange(this.props.timeRange, prevProps.timeRange);
     if (this.props.lastRefreshAt !== prevProps.lastRefreshAt || changedTimeRange) {
@@ -122,6 +143,87 @@ export class TracesComponent extends React.Component<TracesProps, TracesState> {
       this.fetchTraces();
     }
   }
+
+  private setTrace(selectedTrace: JaegerTrace | undefined) {
+    if (selectedTrace) {
+      const traces = this.state.traces;
+      const index = traces.findIndex(t => t.traceID === selectedTrace.traceID);
+      if (index >= 0) {
+        traces[index] = selectedTrace;
+        this.setState({ traces: traces });
+      }
+
+      const { matrix, isComplete } = reduceMetricsStats(selectedTrace, this.state.metricsStats.data, false);
+      this.setState({
+        statsMatrix: matrix,
+        isStatsMatrixComplete: isComplete
+      });
+    }
+    this.setState({ selectedTrace: selectedTrace });
+  }
+
+  private load = (queries: MetricsStatsQuery[], isCompact: boolean) => {
+    const expiry = 2 * 60 * 1000;
+    const oldStats = this.state.metricsStats.data as Map<string, ExpiringStats>;
+    const now = Date.now();
+    // Keep only queries for stats we don't already have, that aren't expired, and are sufficient
+    const newStats = new Map(Array.from(oldStats).filter(([_, v]) => now - v.timestamp < expiry));
+    const filtered = queries.filter(q => {
+      const existingStat = newStats.get(statsQueryToKey(q));
+      // perform the query if we don't have the stat, or if we need full stats and only have compact stats
+      return !existingStat || (!isCompact && existingStat.isCompact);
+    });
+    if (filtered.length > 0) {
+      return getMetricsStats(filtered)
+        .then(res => {
+          // Merge result
+          Object.entries(res.data.stats).forEach(e =>
+            newStats.set(e[0], { ...e[1], timestamp: now, isCompact: isCompact })
+          );
+          // dispatch(MetricsStatsActions.setStats(newStats));
+          this.setState({ metricsStats: { data: newStats } });
+          if (res.data.warnings && res.data.warnings.length > 0) {
+            // addInfo(res.data.warnings.join('; '), false);
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          // addError('Could not fetch metrics stats.', err);
+        });
+    } else {
+      return Promise.resolve();
+    }
+  };
+
+  private setTraceId = (traceId?: string) => {
+    setURLTraceId(traceId);
+    if (traceId) {
+      getJaegerTrace(traceId)
+        .then(response => {
+          if (response.data.data) {
+            const trace = transformTraceData(response.data.data);
+            if (trace) {
+              this.setTrace(trace);
+              // dispatch(JaegerActions.setTrace(trace));
+            }
+          }
+        })
+        .catch(error => {
+          if ((error as AxiosError).response?.status === 404) {
+            setURLTraceId(undefined);
+          }
+          this.setTrace(undefined);
+          // dispatch(JaegerActions.setTrace(undefined));
+          // AlertUtils.addMessage({
+          //   ...AlertUtils.extractAxiosError('Could not fetch trace', error),
+          //   showNotification: false
+          // });
+        });
+    } else {
+      this.setTrace(undefined);
+      // dispatch(JaegerActions.setTrace(undefined));
+    }
+  };
 
   private getTags = () => {
     return this.state.querySettings.errorsOnly ? '{"error":"true"}' : '';
@@ -285,10 +387,13 @@ export class TracesComponent extends React.Component<TracesProps, TracesState> {
               traces={this.state.traces}
               errorFetchTraces={this.state.jaegerErrors}
               errorTraces={true}
+              duration={1000}
+              loadMetricsStats={this.load}
+              setTraceId={this.setTraceId}
             />
           </CardBody>
         </Card>
-        {this.props.selectedTrace && (
+        {this.state.selectedTrace && (
           <div
             style={{
               marginTop: 25
@@ -301,21 +406,29 @@ export class TracesComponent extends React.Component<TracesProps, TracesState> {
               onSelect={(_, idx: any) => this.setState({ activeTab: idx })}
             >
               <Tab eventKey={traceDetailsTab} title="Trace Details">
-                {/* <TraceDetails
+                <TraceDetails
                   namespace={this.props.namespace}
                   target={this.props.target}
                   targetKind={this.props.targetKind}
-                  jaegerURL={this.props.urlJaeger}
+                  jaegerURL={this.props.jaegerInfo.url}
                   otherTraces={this.state.traces}
-                /> */}
+                  isStatsMatrixComplete={this.state.isStatsMatrixComplete}
+                  statsMatrix={this.state.statsMatrix}
+                  loadMetricsStats={this.load}
+                  trace={this.state.selectedTrace}
+                  setTraceId={this.setTraceId}
+                />
               </Tab>
               <Tab eventKey={spansDetailsTab} title="Span Details">
-                {/* <SpanDetails
+                <SpanDetails
                   namespace={this.props.namespace}
                   target={this.props.target}
-                  externalURL={this.props.urlJaeger}
-                  items={this.props.selectedTrace.spans}
-                /> */}
+                  externalURL={this.props.jaegerInfo.url}
+                  items={this.state.selectedTrace.spans}
+                  metricsStats={this.state.metricsStats.data}
+                  loadMetricsStats={this.load}
+                  serverConfig={this.props.serverConfig}
+                />
               </Tab>
             </Tabs>
           </div>

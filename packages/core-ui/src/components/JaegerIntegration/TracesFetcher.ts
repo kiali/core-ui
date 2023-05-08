@@ -1,6 +1,16 @@
 // import * as API from 'services/Api';
 // import * as AlertUtils from 'utils/AlertUtils';
-import { JaegerError, JaegerTrace, TargetKind } from '@kiali/types';
+import {
+  getAppTraces,
+  getServiceTraces,
+  getTimeRangeMicros,
+  getWorkloadTraces,
+  JaegerError,
+  JaegerTrace,
+  TargetKind,
+  TracingQuery,
+  transformTraceData
+} from '@kiali/types';
 
 export type FetchOptions = {
   namespace: string;
@@ -13,7 +23,7 @@ export type FetchOptions = {
 };
 
 export class TracesFetcher {
-  // private lastFetchMicros: number | undefined = undefined;
+  private lastFetchMicros: number | undefined = undefined;
 
   constructor(
     private onChange: (traces: JaegerTrace[], jaegerServiceName: string) => void,
@@ -21,59 +31,51 @@ export class TracesFetcher {
   ) {}
 
   fetch = (o: FetchOptions, oldTraces: JaegerTrace[]) => {
-    console.log(o);
-    console.log(oldTraces);
-    console.log(this.onChange);
-    console.log(this.onErrors);
-    //   const range = getTimeRangeMicros();
-    //   if (range.to) {
-    //     // Closed time frame (looking in past)
-    //     // Turning off incremental refresh as it doesn't make sense with bounded end time
-    //     this.lastFetchMicros = undefined;
-    //   }
-    //   // Incremental refresh
-    //   let traces = this.lastFetchMicros ? oldTraces.filter(t => t.startTime >= range.from) : [];
-    //   const q: TracingQuery = {
-    //     startMicros: this.lastFetchMicros || range.from,
-    //     endMicros: range.to,
-    //     tags: o.tags,
-    //     limit: o.spanLimit,
-    //     minDuration: o.minDuration ? Math.floor(1000 * o.minDuration) : undefined
-    //   };
-    //   const apiCall =
-    //     o.targetKind === 'app'
-    //       ? API.getAppTraces
-    //       : o.targetKind === 'service'
-    //       ? API.getServiceTraces
-    //       : API.getWorkloadTraces;
-    //   apiCall(o.namespace, o.target, q, o.cluster)
-    //     .then(response => {
-    //       const newTraces = response.data.data
-    //         ? (response.data.data
-    //             .map(trace => transformTraceData(trace))
-    //             .filter(trace => trace !== null) as JaegerTrace[])
-    //         : [];
-    //       traces = traces
-    //         // It may happen that a previous trace was updated. If so, replace it (remove from old).
-    //         .filter(oldTrace => !newTraces.map(newTrace => newTrace.traceID).includes(oldTrace.traceID))
-    //         .concat(newTraces);
-    //       // Update last fetch time only if we had some results
-    //       // So that if Jaeger DB hadn't time to ingest data, it's still going to be fetched next time
-    //       if (traces.length > 0) {
-    //         this.lastFetchMicros = Math.max(...traces.map(s => s.startTime));
-    //       }
-    //       this.onChange(traces, response.data.jaegerServiceName);
-    //       if (response.data.errors && response.data.errors.length > 0) {
-    //         this.onErrors(response.data.errors);
-    //       }
-    //     })
-    //     .catch(error => {
-    //       // AlertUtils.addError('Could not fetch traces.', error);
-    //       this.onErrors([{ msg: String(error) }]);
-    //     });
+    const range = getTimeRangeMicros();
+    if (range.to) {
+      // Closed time frame (looking in past)
+      // Turning off incremental refresh as it doesn't make sense with bounded end time
+      this.lastFetchMicros = undefined;
+    }
+    // Incremental refresh
+    let traces = this.lastFetchMicros ? oldTraces.filter(t => t.startTime >= range.from) : [];
+    const q: TracingQuery = {
+      startMicros: this.lastFetchMicros || range.from,
+      endMicros: range.to,
+      tags: o.tags,
+      limit: o.spanLimit,
+      minDuration: o.minDuration ? Math.floor(1000 * o.minDuration) : undefined
+    };
+    const apiCall =
+      o.targetKind === 'app' ? getAppTraces : o.targetKind === 'service' ? getServiceTraces : getWorkloadTraces;
+    apiCall(o.namespace, o.target, q)
+      .then(response => {
+        const newTraces = response.data.data
+          ? (response.data.data
+              .map(trace => transformTraceData(trace))
+              .filter(trace => trace !== null) as JaegerTrace[])
+          : [];
+        traces = traces
+          // It may happen that a previous trace was updated. If so, replace it (remove from old).
+          .filter(oldTrace => !newTraces.map(newTrace => newTrace.traceID).includes(oldTrace.traceID))
+          .concat(newTraces);
+        // Update last fetch time only if we had some results
+        // So that if Jaeger DB hadn't time to ingest data, it's still going to be fetched next time
+        if (traces.length > 0) {
+          this.lastFetchMicros = Math.max(...traces.map(s => s.startTime));
+        }
+        this.onChange(traces, response.data.jaegerServiceName);
+        if (response.data.errors && response.data.errors.length > 0) {
+          this.onErrors(response.data.errors);
+        }
+      })
+      .catch(error => {
+        // AlertUtils.addError('Could not fetch traces.', error);
+        this.onErrors([{ msg: String(error) }]);
+      });
   };
 
   resetLastFetchTime() {
-    // this.lastFetchMicros = undefined;
+    this.lastFetchMicros = undefined;
   }
 }

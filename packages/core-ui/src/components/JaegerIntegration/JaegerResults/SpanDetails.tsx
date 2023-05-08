@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Card, CardBody } from '@patternfly/react-core';
 
-import { RichSpanData, ActiveFiltersInfo, MetricsStats, ComputedServerConfig } from '@kiali/types';
+import { RichSpanData, ActiveFiltersInfo, MetricsStats, ComputedServerConfig, MetricsStatsQuery } from '@kiali/types';
 import { SpanTable } from './SpanTable';
 import { FilterSelected, StatefulFilters } from '../../Filters/StatefulFilters';
 import { spanFilters } from './Filters';
@@ -13,6 +13,8 @@ interface Props {
   namespace: string;
   target: string;
   externalURL?: string;
+  loadMetricsStats: (queries: MetricsStatsQuery[], isCompact: boolean) => void;
+  metricsStats: Map<string, MetricsStats>;
   serverConfig: ComputedServerConfig;
 }
 
@@ -50,9 +52,8 @@ export class SpanDetails extends React.Component<Props, State> {
             items={filteredItems}
             namespace={this.props.namespace}
             externalURL={this.props.externalURL}
-            spanId={''}
-            loadMetricsStats={() => {}}
-            metricsStats={new Map<string, MetricsStats>()}
+            loadMetricsStats={this.props.loadMetricsStats}
+            metricsStats={this.props.metricsStats}
           />
         </CardBody>
       </Card>

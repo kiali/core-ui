@@ -2,7 +2,7 @@ import * as React from 'react';
 import { CardActions, CardHeader, CardTitle, Dropdown, DropdownItem, KebabToggle } from '@patternfly/react-core';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 import { FormattedTraceInfo, fullIDStyle } from './FormattedTraceInfo';
-// import history from 'app/History';
+import history from '../../../utils/History';
 // import { KialiAppState } from '../../../store/Store';
 // import { connect } from 'react-redux';
 // import { isParentKiosk, kioskContextMenuAction } from '../../Kiosk/KioskActions';
@@ -22,7 +22,7 @@ export const JaegerTraceTitle = (props: Props) => {
         // if (isParentKiosk(props.kiosk)) {
         //   kioskContextMenuAction(props.graphURL);
         // } else {
-        //   history.push(props.graphURL);
+        history.push(props.graphURL);
         // }
       }}
     >

@@ -48,8 +48,9 @@ import { style } from 'typestyle';
 import { ExclamationCircleIcon } from '@patternfly/react-icons';
 // import { Link } from 'react-router-dom';
 import { renderMetricsComparison } from './StatsComparison';
-// import history from 'app/History';
+import history from '../../../utils/History';
 import { AngleDownIcon, AngleRightIcon, ExternalLinkAltIcon } from '@patternfly/react-icons';
+import { getSpanId } from '../../../utils/SearchParamUtils';
 // import { isParentKiosk, kioskContextMenuAction } from '../../Kiosk/KioskActions';
 
 // type ReduxProps = {
@@ -62,7 +63,6 @@ type Props = {
   externalURL?: string;
   items: RichSpanData[];
   namespace: string;
-  spanId: string;
   loadMetricsStats: (queries: MetricsStatsQuery[], isCompact: boolean) => void;
   metricsStats: Map<string, MetricsStats>;
 };
@@ -130,7 +130,7 @@ const cells: SortableCell<RichSpanData>[] = [
 export class SpanTable extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    const isSpan = this.props.spanId;
+    const isSpan = getSpanId();
     const mapExpandedSpans = new Map();
     isSpan && mapExpandedSpans.set(isSpan, true);
     this.state = {
@@ -201,7 +201,7 @@ export class SpanTable extends React.Component<Props, State> {
 
   private buildRow = (item: RichSpanData): IRow => {
     const isExpanded = this.isExpanded(item.spanID);
-    const isSpan = item.spanID === this.props.spanId;
+    const isSpan = item.spanID === getSpanId();
 
     return {
       cells: [
@@ -249,7 +249,7 @@ export class SpanTable extends React.Component<Props, State> {
           // if (parentKiosk) {
           //   kioskContextMenuAction(href);
           // } else {
-          //   history.push(href);
+          history.push(href);
           // }
         }
       },
@@ -261,7 +261,7 @@ export class SpanTable extends React.Component<Props, State> {
           // if (parentKiosk) {
           //   kioskContextMenuAction(href);
           // } else {
-          //   history.push(href);
+          history.push(href);
           // }
         }
       }
@@ -287,7 +287,7 @@ export class SpanTable extends React.Component<Props, State> {
             // if (parentKiosk) {
             //   kioskContextMenuAction(href);
             // } else {
-            //   history.push(href);
+            history.push(href);
             // }
           }
         },
@@ -299,7 +299,7 @@ export class SpanTable extends React.Component<Props, State> {
             // if (parentKiosk) {
             //   kioskContextMenuAction(href);
             // } else {
-            //   history.push(href);
+            history.push(href);
             // }
           }
         },
@@ -311,7 +311,7 @@ export class SpanTable extends React.Component<Props, State> {
             // if (parentKiosk) {
             //   kioskContextMenuAction(href);
             // } else {
-            //   history.push(href);
+            history.push(href);
             // }
           }
         }

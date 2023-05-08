@@ -31,12 +31,11 @@ import {
 } from '@kiali/types';
 import * as FilterHelper from '../FilterList/FilterHelper';
 import { style } from 'typestyle';
+import classnames from 'classnames';
 import { LabelFilters } from './LabelFilter';
 import { labelFilter } from './CommonFilters';
 import history, { HistoryManager } from '../../utils/History';
 // import { serverConfig } from 'config';
-
-var classNames = require('classnames');
 
 const toolbarStyle = style({
   padding: 0,
@@ -114,7 +113,6 @@ export class Toggles {
     Toggles.checked.clear();
     Toggles.numChecked = 0;
 
-    console.log(toggles);
     // Prefer URL settings
     const urlParams = new URLSearchParams(history.location.search);
     toggles.forEach(t => {
@@ -129,7 +127,7 @@ export class Toggles {
   };
 
   static setToggle = (name: string, value: boolean): number => {
-    // HistoryManager.setParam(`${name}Toggle`, `${value}`);
+    HistoryManager.setParam(`${name}Toggle`, `${value}`);
     Toggles.checked.set(name, value);
     Toggles.numChecked = value ? Toggles.numChecked++ : Toggles.numChecked--;
     return Toggles.numChecked;
@@ -382,7 +380,7 @@ export class StatefulFilters extends React.Component<StatefulFiltersProps, State
                 child && (
                   <ToolbarItem
                     key={'toolbar_statefulFilters_' + index}
-                    className={classNames(
+                    className={classnames(
                       'pf-u-mr-md',
                       index === (this.props.children as Array<any>).length - 1 ? paddingStyle : dividerStyle
                     )}
@@ -471,8 +469,8 @@ export class StatefulFilters extends React.Component<StatefulFiltersProps, State
             {!this.props.childrenFirst && this.renderChildren()}
             {hasActiveFilters && (
               <ToolbarGroup>
-                <ToolbarItem className={classNames('pf-u-mr-md')}>
-                  <span className={classNames(paddingStyle)}>Label Operation</span>
+                <ToolbarItem className={classnames('pf-u-mr-md')}>
+                  <span className={classnames(paddingStyle)}>Label Operation</span>
                   <FormSelect
                     value={activeFilters.op}
                     onChange={value =>

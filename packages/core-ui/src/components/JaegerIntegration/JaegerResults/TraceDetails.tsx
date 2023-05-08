@@ -16,7 +16,9 @@ import {
   TargetKind,
   MetricsStatsQuery,
   formatDuration,
-  sameSpans
+  sameSpans,
+  NodeType,
+  GraphType
 } from '@kiali/types';
 import { JaegerTraceTitle } from './JaegerTraceTitle';
 import { FormattedTraceInfo, shortIDStyle } from './FormattedTraceInfo';
@@ -27,6 +29,8 @@ import { TraceLabels } from './TraceLabels';
 // import MetricsStatsThunkActions from 'actions/MetricsStatsThunkActions';
 import { renderTraceHeatMap } from './StatsComparison';
 import { HeatMap } from '../../HeatMap/HeatMap';
+import { getTraceId } from '../../../utils/SearchParamUtils';
+import { CytoscapeGraphSelectorBuilder } from '../../../components/CytoscapeGraph/CytoscapeGraphSelector';
 
 // type ReduxProps = {
 //   loadMetricsStats: (queries: MetricsStatsQuery[], isCompact: boolean) => void;
@@ -51,13 +55,13 @@ interface State {}
 export class TraceDetails extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    // const urlTrace = getTraceId();
-    // if (urlTrace && urlTrace !== props.trace?.traceID) {
-    //   props.setTraceId(urlTrace);
-    // } else if (!urlTrace && props.trace) {
-    //   // Remove old stored selected trace
-    //   props.setTraceId(undefined);
-    // }
+    const urlTrace = getTraceId();
+    if (urlTrace && urlTrace !== props.trace?.traceID) {
+      props.setTraceId(urlTrace);
+    } else if (!urlTrace && props.trace) {
+      // Remove old stored selected trace
+      props.setTraceId(undefined);
+    }
     this.state = { completeMetricsStats: false };
   }
 
@@ -78,28 +82,28 @@ export class TraceDetails extends React.Component<Props, State> {
     this.props.loadMetricsStats(queries, false);
   }
 
-  // private getGraphURL = (traceID: string) => {
-  //   let cytoscapeGraph = new CytoscapeGraphSelectorBuilder().namespace(this.props.namespace);
-  //   let graphType: GraphType = GraphType.APP;
+  private getGraphURL = (traceID: string) => {
+    let cytoscapeGraph = new CytoscapeGraphSelectorBuilder().namespace(this.props.namespace);
+    let graphType: GraphType = GraphType.APP;
 
-  //   switch (this.props.targetKind) {
-  //     case 'app':
-  //       cytoscapeGraph = cytoscapeGraph.app(this.props.target).nodeType(NodeType.APP);
-  //       break;
-  //     case 'service':
-  //       graphType = GraphType.SERVICE;
-  //       cytoscapeGraph = cytoscapeGraph.service(this.props.target);
-  //       break;
-  //     case 'workload':
-  //       graphType = GraphType.WORKLOAD;
-  //       cytoscapeGraph = cytoscapeGraph.workload(this.props.target);
-  //       break;
-  //   }
+    switch (this.props.targetKind) {
+      case 'app':
+        cytoscapeGraph = cytoscapeGraph.app(this.props.target).nodeType(NodeType.APP);
+        break;
+      case 'service':
+        graphType = GraphType.SERVICE;
+        cytoscapeGraph = cytoscapeGraph.service(this.props.target);
+        break;
+      case 'workload':
+        graphType = GraphType.WORKLOAD;
+        cytoscapeGraph = cytoscapeGraph.workload(this.props.target);
+        break;
+    }
 
-  //   return `/graph/namespaces?graphType=${graphType}&injectServiceNodes=true&namespaces=${
-  //     this.props.namespace
-  //   }&traceId=${traceID}&focusSelector=${encodeURI(cytoscapeGraph.build())}`;
-  // };
+    return `/graph/namespaces?graphType=${graphType}&injectServiceNodes=true&namespaces=${
+      this.props.namespace
+    }&traceId=${traceID}&focusSelector=${encodeURI(cytoscapeGraph.build())}`;
+  };
 
   private renderSimilarHeatmap = (
     similarTraces: JaegerTrace[],
@@ -193,8 +197,7 @@ export class TraceDetails extends React.Component<Props, State> {
         <JaegerTraceTitle
           formattedTrace={formattedTrace}
           externalURL={jaegerURL ? `${jaegerURL}/trace/${trace.traceID}` : undefined}
-          // graphURL={this.getGraphURL(trace.traceID)}
-          graphURL={''}
+          graphURL={this.getGraphURL(trace.traceID)}
           comparisonURL={comparisonLink}
         />
         <CardBody>
