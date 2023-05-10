@@ -11,11 +11,11 @@ import {
   GraphElements,
   GraphNodeWrapper,
   hasProtocolTraffic
-} from '../types/Graph';
+} from './Graph';
 import { ComputedServerConfig, isIstioNamespace } from '../config/ServerConfig';
 import { toSafeCyFieldName } from '../utils/CytoscapeGraph';
-import { AppHealth, ServiceHealth, WorkloadHealth } from '../types/Health';
-import { NA } from '../types/HealthStatus';
+import { AppHealth, ServiceHealth, WorkloadHealth } from './Health';
+import { NA } from './HealthStatus';
 
 // When updating the cytoscape graph, the element data expects to have all the changes
 // non-provided values are taken as "this didn't change", similar as setState does.

@@ -1,7 +1,6 @@
 /* eslint-disable no-redeclare */
 import axios, { AxiosError } from 'axios';
 import { ComputedServerConfig, config } from '../config';
-import { LoginSession } from '../store/Store';
 import { App } from '../types/App';
 import { AppList } from '../types/AppList';
 import { AuthInfo } from '../types/Auth';
@@ -44,6 +43,7 @@ import { TracingSpan, TracingQuery } from '../types/Tracing';
 import { TLSStatus } from '../types/TLSStatus';
 import { Workload, WorkloadNamespaceResponse } from '../types/Workload';
 import { CertsInfo } from '../types/CertsInfo';
+import { LoginSession } from '../types/Login';
 export const ANONYMOUS_USER = 'anonymous';
 
 export interface Response<T> {

@@ -15,7 +15,7 @@ import { Namespace } from '../types/Namespace';
 // import * as AlertUtils from '../utils/AlertUtils';
 import { PromisesRegistry } from '../utils/CancelablePromises';
 import * as API from './Api';
-import { decorateGraphData } from '../store/GraphData';
+import { decorateGraphData } from '../types/GraphData';
 import EventEmitter from 'eventemitter3';
 import { createSelector } from 'reselect';
 import { ComputedServerConfig } from '../config';

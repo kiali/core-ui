@@ -20,16 +20,22 @@ import {
   k8sGwToIstioItems,
   ComputedServerConfig,
   PromisesRegistry,
-  GraphDataSource
+  GraphDataSource,
+  UserSettings,
+  WizardAction,
+  WizardMode,
+  GraphState
 } from '@kiali/types';
 // import { RenderComponentScroll } from '../../components/Nav/Page';
 // import { PromisesRegistry } from 'utils/CancelablePromises';
 // import GraphDataSource from 'services/GraphDataSource';
 import ServiceNetwork from './ServiceNetwork';
 // import { GraphEdgeTapEvent } from '../../components/CytoscapeGraph/CytoscapeGraph';
-// import history, { URLParam } from '../../app/History';
+import history, { URLParam } from '../../utils/History';
 // import MiniGraphCardContainer from '../../components/CytoscapeGraph/MiniGraphCard';
 import IstioConfigCard from '../IstioConfig/IstioConfigCard';
+import { GraphEdgeTapEvent } from '../CytoscapeGraph/CytoscapeGraph';
+import { MiniGraphCard } from '../CytoscapeGraph/MiniGraphCard';
 // import { WizardAction, WizardMode } from '../../components/IstioWizards/WizardActions';
 // import { triggerRefresh } from '../../hooks/refresh';
 
@@ -43,6 +49,8 @@ interface Props extends ServiceId {
   validations: Validations;
   istioAPIEnabled: boolean;
   serverConfig: ComputedServerConfig;
+  userSettings: UserSettings;
+  graphSettings: GraphState;
   linkTemplate: (name: string, namespace: string, objectType: string) => JSX.Element;
 }
 
@@ -85,16 +93,16 @@ export class ServiceInfo extends React.Component<Props, ServiceInfoState> {
     }
   }
 
-  // goToMetrics = (e: GraphEdgeTapEvent) => {
-  //   if (e.source !== e.target) {
-  //     const direction = e.source === this.props.service ? 'outbound' : 'inbound';
-  //     const destination = direction === 'inbound' ? 'source_canonical_service' : 'destination_canonical_service';
-  //     const urlParams = new URLSearchParams(history.location.search);
-  //     urlParams.set('tab', 'metrics');
-  //     urlParams.set(URLParam.BY_LABELS, destination + '=' + (e.source === this.props.service ? e.target : e.source));
-  //     history.replace(history.location.pathname + '?' + urlParams.toString());
-  //   }
-  // };
+  goToMetrics = (e: GraphEdgeTapEvent) => {
+    if (e.source !== e.target) {
+      const direction = e.source === this.props.service ? 'outbound' : 'inbound';
+      const destination = direction === 'inbound' ? 'source_canonical_service' : 'destination_canonical_service';
+      const urlParams = new URLSearchParams(history.location.search);
+      urlParams.set('tab', 'metrics');
+      urlParams.set(URLParam.BY_LABELS, destination + '=' + (e.source === this.props.service ? e.target : e.source));
+      history.replace(history.location.pathname + '?' + urlParams.toString());
+    }
+  };
 
   private fetchBackend = () => {
     if (!this.props.serviceDetails) {
@@ -134,21 +142,22 @@ export class ServiceInfo extends React.Component<Props, ServiceInfoState> {
   //       triggerRefresh();
   //     })
   //     .catch(error => {
+  //       console.error('Could not delete Istio config objects.');
   //       // AlertUtils.addError('Could not delete Istio config objects.', error);
   //     });
   // };
 
-  // private handleDeleteTrafficRouting = (_key: string) => {
-  //   this.setState({ showConfirmDeleteTrafficRouting: true });
-  // };
+  private handleDeleteTrafficRouting = (_key: string) => {
+    this.setState({ showConfirmDeleteTrafficRouting: true });
+  };
 
-  // private handleLaunchWizard = (action: WizardAction, mode: WizardMode) => {
-  //   this.setState({
-  //     showWizard: true,
-  //     wizardType: action,
-  //     updateMode: mode === 'update'
-  //   });
-  // };
+  private handleLaunchWizard = (action: WizardAction, mode: WizardMode) => {
+    this.setState({
+      showWizard: true,
+      wizardType: action,
+      updateMode: mode === 'update'
+    });
+  };
 
   render() {
     const vsIstioConfigItems = this.props.serviceDetails?.virtualServices
@@ -189,7 +198,7 @@ export class ServiceInfo extends React.Component<Props, ServiceInfoState> {
     // This height needs to be propagated to minigraph to proper resize in height
     // Graph resizes correctly on width
     // const height = this.state.tabHeight ? this.state.tabHeight - 115 : 300;
-    // const graphContainerStyle = style({ width: '100%', height: height });
+    const graphContainerStyle = style({ width: '100%', height: 500 });
 
     return (
       <>
@@ -218,15 +227,18 @@ export class ServiceInfo extends React.Component<Props, ServiceInfoState> {
             </Stack>
           </GridItem>
           <GridItem span={8}>
-            {/* <MiniGraphCardContainer
-                dataSource={this.graphDataSource}
-                mtlsEnabled={this.props.mtlsEnabled}
-                onEdgeTap={this.goToMetrics}
-                graphContainerStyle={graphContainerStyle}
-                serviceDetails={this.props.serviceDetails}
-                onDeleteTrafficRouting={this.handleDeleteTrafficRouting}
-                onLaunchWizard={this.handleLaunchWizard}
-              /> */}
+            <MiniGraphCard
+              dataSource={this.graphDataSource}
+              mtlsEnabled={this.props.mtlsEnabled}
+              onEdgeTap={this.goToMetrics}
+              graphContainerStyle={graphContainerStyle}
+              serviceDetails={this.props.serviceDetails}
+              onDeleteTrafficRouting={this.handleDeleteTrafficRouting}
+              onLaunchWizard={this.handleLaunchWizard}
+              serverConfig={this.props.serverConfig}
+              userSettings={this.props.userSettings}
+              graphSettings={this.props.graphSettings}
+            />
           </GridItem>
         </Grid>
         {/* </RenderComponentScroll> */}
