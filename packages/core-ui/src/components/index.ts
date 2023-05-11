@@ -9,3 +9,4 @@ export * from './Pf';
 export * from './ServiceDetails';
 export * from './TrafficList';
 export * from './Validations';
+export * from './Workload';
