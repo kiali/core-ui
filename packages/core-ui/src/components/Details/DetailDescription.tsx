@@ -5,7 +5,7 @@ import { style } from 'typestyle';
 import MissingSidecar from '../Missing/MissingSidecar';
 import { renderTrafficStatus } from '../Health/HealthDetails';
 import { createIcon } from '../Health/Helper';
-import { PFBadge, PFBadges } from '../Pf/PfBadges';
+// import { PFBadge, PFBadges } from '../Pf/PfBadges';
 import { KialiIcon } from '../../config/KialiIcon';
 
 type Props = {
@@ -18,11 +18,11 @@ type Props = {
   linkTemplate: (name: string, namespace: string, objectType: string) => JSX.Element;
 };
 
-const iconStyle = style({
-  margin: '0 0 0 0',
-  padding: '0 0 0 0',
-  display: 'inline-block'
-});
+// const iconStyle = style({
+//   margin: '0 0 0 0',
+//   padding: '0 0 0 0',
+//   display: 'inline-block'
+// });
 
 const resourceListStyle = style({
   margin: '0px 0 11px 0',
@@ -50,9 +50,9 @@ class DetailDescription extends React.Component<Props> {
     // const link = <Link to={href}>{appName}</Link>;
     return (
       <li key={`App_${namespace}_${appName}`}>
-        <div className={iconStyle}>
+        {/* <div className={iconStyle}>
           <PFBadge badge={PFBadges.App} position={TooltipPosition.top} />
-        </div>
+        </div> */}
         <span>{this.props.linkTemplate(appName, namespace, 'application')}</span>
       </li>
     );
@@ -63,9 +63,9 @@ class DetailDescription extends React.Component<Props> {
     // const link = <Link to={href}>{serviceName}</Link>;
     return (
       <li key={`Service_${serviceName}`}>
-        <div className={iconStyle}>
+        {/* <div className={iconStyle}>
           <PFBadge badge={PFBadges.Service} position={TooltipPosition.top} />
-        </div>
+        </div> */}
         <span>{this.props.linkTemplate(serviceName, namespace, 'service')}</span>
       </li>
     );
@@ -98,9 +98,9 @@ class DetailDescription extends React.Component<Props> {
     // const link = <Link to={href}>{workload.workloadName}</Link>;
     return (
       <span key={'WorkloadItem_' + workload.workloadName}>
-        <div className={iconStyle}>
+        {/* <div className={iconStyle}>
           <PFBadge badge={PFBadges.Workload} position={TooltipPosition.top} />
-        </div>
+        </div> */}
         {this.props.linkTemplate(workload.workloadName, this.props.namespace, 'workload')}
         <Tooltip position={TooltipPosition.right} content={this.renderServiceAccounts(workload)}>
           <KialiIcon.Info className={infoStyle} />
@@ -135,9 +135,9 @@ class DetailDescription extends React.Component<Props> {
       // const link = <Link to={href}>{workload.workloadName}</Link>;
       return (
         <span key={`WorkloadItem_${workload.workloadName}`}>
-          <div className={iconStyle}>
+          {/* <div className={iconStyle}>
             <PFBadge badge={PFBadges.Workload} position={TooltipPosition.top} />
-          </div>
+          </div> */}
           {this.props.linkTemplate(workload.workloadName, this.props.namespace, 'workload')}
           <Tooltip position={TooltipPosition.right} content={this.renderServiceAccounts(workload)}>
             <KialiIcon.Info className={infoStyle} />

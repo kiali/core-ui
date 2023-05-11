@@ -1,3 +1,4 @@
+export * from './Envoy';
 export * from './IstioActions';
 export * from './IstioConfig';
 export * from './JaegerIntegration';
