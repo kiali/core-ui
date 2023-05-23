@@ -12,9 +12,9 @@ const LayoutMap = {
 };
 
 const getLayout = (layout: Layout) =>
-  LayoutMap.hasOwnProperty(layout.name) ? LayoutMap[layout.name] : LayoutMap['kiali-dagre'];
+  Object.prototype.hasOwnProperty.call(LayoutMap, layout.name) ? LayoutMap[layout.name] : LayoutMap['kiali-dagre'];
 
 const getLayoutByName = (layoutName: string) =>
-  LayoutMap.hasOwnProperty(layoutName) ? LayoutMap[layoutName] : LayoutMap['kiali-dagre'];
+  Object.prototype.hasOwnProperty.call(LayoutMap, layoutName) ? LayoutMap[layoutName] : LayoutMap['kiali-dagre'];
 
 export { getLayout, getLayoutByName };

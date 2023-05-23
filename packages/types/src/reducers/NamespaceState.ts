@@ -21,7 +21,7 @@ export const INITIAL_NAMESPACE_STATE: NamespaceState = {
 
 const namespaces = (state: NamespaceState = INITIAL_NAMESPACE_STATE, action: KialiAppAction): NamespaceState => {
   switch (action.type) {
-    case getType(NamespaceActions.toggleActiveNamespace):
+    case getType(NamespaceActions.toggleActiveNamespace): {
       const namespaceIndex = state.activeNamespaces.findIndex(namespace => namespace.name === action.payload.name);
       if (namespaceIndex === -1) {
         return updateState(state, {
@@ -32,7 +32,7 @@ const namespaces = (state: NamespaceState = INITIAL_NAMESPACE_STATE, action: Kia
         activeNamespaces.splice(namespaceIndex, 1);
         return updateState(state, { activeNamespaces });
       }
-
+    }
     case getType(NamespaceActions.setActiveNamespaces):
       return updateState(state, { activeNamespaces: filterDuplicateNamespaces(action.payload) });
 
@@ -44,7 +44,7 @@ const namespaces = (state: NamespaceState = INITIAL_NAMESPACE_STATE, action: Kia
         isFetching: true
       });
 
-    case getType(NamespaceActions.receiveList):
+    case getType(NamespaceActions.receiveList): {
       const names = action.payload.list.map(ns => ns.name);
       const validActive = state.activeNamespaces.filter(an => names.includes(an.name));
       let updatedActive = {};
@@ -57,7 +57,7 @@ const namespaces = (state: NamespaceState = INITIAL_NAMESPACE_STATE, action: Kia
         lastUpdated: action.payload.receivedAt,
         ...updatedActive
       });
-
+    }
     case getType(NamespaceActions.requestFailed):
       return updateState(state, {
         isFetching: false

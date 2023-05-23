@@ -33,7 +33,7 @@ const loginState = (state: LoginStateInterface = INITIAL_LOGIN_STATE, action: Ki
         status: LoginStatus.loggedIn,
         session: action.payload.session
       };
-    case getType(LoginActions.loginFailure):
+    case getType(LoginActions.loginFailure): {
       let message = 'Error connecting to Kiali';
 
       const response_data = action.payload.error.response.data;
@@ -50,6 +50,7 @@ const loginState = (state: LoginStateInterface = INITIAL_LOGIN_STATE, action: Ki
         message: message,
         status: LoginStatus.error
       };
+    }
     case getType(LoginActions.logoutSuccess):
       return INITIAL_LOGIN_STATE;
     case getType(LoginActions.sessionExpired):

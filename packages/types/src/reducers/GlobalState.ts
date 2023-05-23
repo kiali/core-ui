@@ -21,9 +21,10 @@ const globalState = (state: GlobalState = INITIAL_GLOBAL_STATE, action: KialiApp
       return updateState(state, { isPageVisible: false });
     case getType(GlobalActions.setPageVisibilityVisible):
       return updateState(state, { isPageVisible: true });
-    case getType(GlobalActions.setKiosk):
+    case getType(GlobalActions.setKiosk): {
       const kiosk = action.payload;
       return updateState(state, { kiosk: kiosk });
+    }
     default:
       return state;
   }

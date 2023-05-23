@@ -98,7 +98,7 @@ const graphDataState = (state: GraphState = INITIAL_GRAPH_STATE, action: KialiAp
           findValue: action.payload
         })
       });
-    case getType(GraphToolbarActions.setGraphType):
+    case getType(GraphToolbarActions.setGraphType): {
       const isServiceGraph = action.payload === GraphType.SERVICE;
       const showOperationNodes = isServiceGraph ? false : state.toolbarState.showOperationNodes;
       const showServiceNodes = isServiceGraph ? false : state.toolbarState.showServiceNodes;
@@ -111,6 +111,7 @@ const graphDataState = (state: GraphState = INITIAL_GRAPH_STATE, action: KialiAp
         // TODO: This should be handled in GraphPage.ComponentDidUpdate (Init graph on type change)
         summaryData: INITIAL_GRAPH_STATE.summaryData
       });
+    }
     case getType(GraphToolbarActions.setHideValue):
       return updateState(state, {
         toolbarState: updateState(state.toolbarState, {

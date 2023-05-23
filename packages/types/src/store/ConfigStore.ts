@@ -1,6 +1,7 @@
 import { createStore, applyMiddleware, compose, Store } from 'redux';
 import { KialiAppState } from './Store';
 import { persistStore, persistReducer } from 'redux-persist';
+import { PersistGate } from 'redux-persist/integration/react';
 import { persistFilter } from 'redux-persist-transform-filter';
 import { createTransform } from 'redux-persist';
 
@@ -100,3 +101,4 @@ const initialStore: KialiAppState = {
 // pass an optional param to rehydrate state on app start
 export const store = configureStore(initialStore);
 export const persistor = persistStore(store);
+export { PersistGate };
