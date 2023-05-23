@@ -1,17 +1,8 @@
-import {
-  HEALTHY,
-  NA,
-  RATIO_NA,
-  RequestHealth,
-  RequestType,
-  ThresholdStatus,
-  getRequestErrorsStatus
-} from '../HealthStatus';
-import { RateHealth } from '../HealthAnnotation';
+import { getRequestErrorsStatus, HEALTHY, NA, RATIO_NA, RequestHealth, RequestType, ThresholdStatus } from '../Health';
 import { ToleranceConfig } from '../ServerConfig';
-import { checkExpr, getRateHealthConfig, getErrorCodeRate, aggregate } from './utils';
-import { ComputedServerConfig } from '../../config';
+import { checkExpr, emptyRate, getRateHealthConfig, getErrorCodeRate } from './utils';
 import { ErrorRatio, Rate, RequestTolerance } from './types';
+import { RateHealth } from '../HealthAnnotation';
 
 // Sum the inbound and outbound request for calculating the global status
 export const sumRequests = (inbound: RequestType, outbound: RequestType): RequestType => {
@@ -54,7 +45,6 @@ const getAggregate = (
 };
 
 export const calculateErrorRate = (
-  serverConfig: ComputedServerConfig,
   ns: string,
   name: string,
   kind: string,
@@ -62,7 +52,7 @@ export const calculateErrorRate = (
 ): { errorRatio: ErrorRatio; config: ToleranceConfig[] } => {
   // Get the first configuration that match with the case
   const rateAnnotation = new RateHealth(requests.healthAnnotations);
-  const conf = rateAnnotation.toleranceConfig || getRateHealthConfig(serverConfig, ns, name, kind).tolerance;
+  const conf = rateAnnotation.toleranceConfig || getRateHealthConfig(ns, name, kind).tolerance;
 
   // Get aggregate
   let status = getAggregate(requests, conf);
@@ -127,6 +117,46 @@ export const calculateStatus = (
         result.protocol = protocol;
         result.toleranceConfig = reqTol.tolerance;
       }
+    }
+  }
+  return result;
+};
+
+export const generateRateForTolerance = (
+  tol: RequestTolerance,
+  requests: { [key: string]: { [key: string]: number } }
+) => {
+  for (let [protocol, req] of Object.entries(requests)) {
+    if (checkExpr(tol!.tolerance!.protocol, protocol)) {
+      for (let [code, value] of Object.entries(req)) {
+        if (!Object.keys(tol.requests).includes(protocol)) {
+          tol.requests[protocol] = emptyRate();
+        }
+        (tol.requests[protocol] as Rate).requestRate += Number(value);
+        if (checkExpr(tol!.tolerance!.code, code)) {
+          (tol.requests[protocol] as Rate).errorRate += Number(value);
+        }
+      }
+    }
+    if (Object.keys(tol.requests).includes(protocol)) {
+      if ((tol.requests[protocol] as Rate).requestRate === 0) {
+        (tol.requests[protocol] as Rate).errorRatio = -1;
+      } else {
+        (tol.requests[protocol] as Rate).errorRatio =
+          (tol.requests[protocol] as Rate).errorRate / (tol.requests[protocol] as Rate).requestRate;
+      }
+    }
+  }
+};
+
+// Aggregate the results
+export const aggregate = (request: RequestType, tolerances?: ToleranceConfig[]): RequestTolerance[] => {
+  let result: RequestTolerance[] = [];
+  if (request && tolerances) {
+    for (let tol of Object.values(tolerances)) {
+      let newReqTol: RequestTolerance = { tolerance: tol, requests: {} };
+      generateRateForTolerance(newReqTol, request);
+      result.push(newReqTol);
     }
   }
   return result;

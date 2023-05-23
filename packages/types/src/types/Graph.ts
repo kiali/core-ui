@@ -1,4 +1,7 @@
-import { DurationInSeconds, Health, HealthAnnotationType, Namespace, TimeInSeconds } from './';
+import { Namespace } from './Namespace';
+import { DurationInSeconds, TimeInSeconds } from './Common';
+import { Health } from './Health';
+import { HealthAnnotationType } from './HealthAnnotation';
 
 export interface Layout {
   name: string;
@@ -200,6 +203,7 @@ export interface NodeParamsType {
   service: string;
   version?: string;
   workload: string;
+  cluster?: string;
 }
 
 // This data is stored in the _global scratch area in the cy graph
@@ -296,6 +300,12 @@ export const prettyProtocol = (protocol: ValidProtocols): string => {
       return 'gRPC';
   }
 };
+
+export interface DestService {
+  cluster: string;
+  namespace: string;
+  name: string;
+}
 
 export interface DestService {
   cluster: string;

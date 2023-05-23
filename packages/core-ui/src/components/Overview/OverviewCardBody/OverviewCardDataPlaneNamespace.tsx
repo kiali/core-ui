@@ -67,10 +67,10 @@ class OverviewCardDataPlaneNamespace extends React.Component<Props, {}> {
                 'sparkline-' +
                 this.props.direction.toLowerCase() +
                 '-duration-' +
-                getName(this.props.config, this.props.duration).toLowerCase()
+                getName(this.props.duration).toLowerCase()
               }
             >
-              {this.props.direction + ' traffic, ' + getName(this.props.config, this.props.duration).toLowerCase()}
+              {this.props.direction + ' traffic, ' + getName(this.props.duration).toLowerCase()}
             </div>
             <SparklineChart
               name={'traffics'}

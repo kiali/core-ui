@@ -1,4 +1,4 @@
-import { ExternalLink } from './';
+import { ExternalLink } from './Dashboards';
 
 export const ISTIO_MESH_DASHBOARD = 'Istio Mesh Dashboard';
 export const ISTIO_CONTROL_PLANE_DASHBOARD = 'Istio Control Plane Dashboard';

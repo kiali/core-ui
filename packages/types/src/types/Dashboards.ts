@@ -1,4 +1,4 @@
-import { LabelDisplayName, Metric, PromLabel } from './';
+import { Metric, PromLabel, LabelDisplayName } from './Metrics';
 
 export interface DashboardModel {
   title: string;

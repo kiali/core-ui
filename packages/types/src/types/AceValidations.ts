@@ -1,4 +1,4 @@
-import { HelpMessage, ObjectCheck, ObjectValidation } from './';
+import { HelpMessage, ObjectCheck, ObjectValidation } from './IstioObjects';
 import { Annotation } from 'react-ace/types';
 import { IMarker } from 'react-ace';
 import * as jsYaml from 'js-yaml';

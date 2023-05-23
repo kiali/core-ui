@@ -1,4 +1,5 @@
-import { ThresholdStatus, ToleranceConfig } from '../';
+import { ToleranceConfig } from '../ServerConfig';
+import { ThresholdStatus } from '../Health';
 
 /*
 Error Ratio for:

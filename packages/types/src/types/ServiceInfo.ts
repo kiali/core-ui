@@ -1,5 +1,4 @@
-/* eslint-disable no-redeclare */
-import { DEGRADED, FAILURE, HEALTHY, NA, Status } from './HealthStatus';
+import { DEGRADED, FAILURE, HEALTHY, NA, ServiceHealth, Status } from './Health';
 import {
   DestinationRule,
   getWizardUpdateLabel,
@@ -16,7 +15,6 @@ import { TLSStatus } from './TLSStatus';
 import { AdditionalItem } from './Workload';
 import { ResourcePermissions } from './Permissions';
 import { ServiceOverview } from './ServiceList';
-import { Namespace, WorkloadOverview, ServiceHealth } from './';
 
 export interface ServicePort {
   name: string;
@@ -40,24 +38,36 @@ interface EndpointAddress {
   tlsMode?: string;
 }
 
-export interface Service {
+export interface WorkloadOverview {
+  name: string;
+  type: string;
+  istioSidecar: boolean;
+  istioAmbient: boolean;
+  labels?: { [key: string]: string };
+  resourceVersion: string;
+  createdAt: string;
+  serviceAccountNames: string[];
+}
+
+interface Service {
   type: string;
   name: string;
-  namespace: Namespace;
   createdAt: string;
   resourceVersion: string;
   ip: string;
   ports?: ServicePort[];
-  annotations: { [key: string]: string };
-  externalName: string;
+  annotations?: { [key: string]: string };
+  externalName?: string;
   labels?: { [key: string]: string };
   selectors?: { [key: string]: string };
+  cluster?: string;
 }
 
 export interface ServiceDetailsInfo {
   service: Service;
   endpoints?: Endpoints[];
   istioSidecar: boolean;
+  istioAmbient: boolean;
   virtualServices: VirtualService[];
   k8sHTTPRoutes: K8sHTTPRoute[];
   destinationRules: DestinationRule[];
@@ -69,6 +79,7 @@ export interface ServiceDetailsInfo {
   namespaceMTLS?: TLSStatus;
   validations: Validations;
   additionalDetails: AdditionalItem[];
+  cluster?: string;
 }
 
 export function getServiceDetailsUpdateLabel(serviceDetails: ServiceDetailsInfo | null) {

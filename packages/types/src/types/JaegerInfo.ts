@@ -4,11 +4,6 @@
 
 import { Target } from './MetricsOptions';
 
-export type JaegerState = {
-  info?: JaegerInfo;
-  selectedTrace?: JaegerTrace;
-};
-
 export interface JaegerInfo {
   enabled: boolean;
   integration: boolean;
@@ -74,6 +69,7 @@ export type RichSpanData = Span & {
   pod?: string;
   linkToWorkload?: string;
   info: OpenTracingBaseInfo;
+  cluster: string;
 };
 
 export type OpenTracingBaseInfo = {

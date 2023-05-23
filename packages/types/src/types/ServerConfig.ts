@@ -41,8 +41,16 @@ interface GraphUIDefaults {
   traffic: GraphTraffic;
 }
 
+interface ListUIDefaults {
+  includeHealth: boolean;
+  includeIstioResources: boolean;
+  includeValidations: boolean;
+  showIncludeToggles: boolean;
+}
+
 interface UIDefaults {
   graph: GraphUIDefaults;
+  list: ListUIDefaults;
   metricsPerRefresh?: string;
   namespaces?: string[];
   refreshInterval?: string;
@@ -111,6 +119,7 @@ export interface ToleranceConfig {
 
 export interface ServerConfig {
   accessibleNamespaces: Array<string>;
+  ambientEnabled: boolean;
   authStrategy: string;
   clusterInfo?: ClusterInfo;
   clusters: { [key: string]: MeshCluster };

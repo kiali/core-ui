@@ -201,7 +201,7 @@ export const hasMissingAuthPolicy = (workloadName: string, validations: Validati
     const workloadValidation = validations['workload'][workloadName];
 
     workloadValidation.checks.forEach((check: ObjectCheck) => {
-      if (check.code === 'KIA1201') {
+      if (check.code === 'KIA1301') {
         hasMissingAP = true;
       }
     });

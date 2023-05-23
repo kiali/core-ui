@@ -17,6 +17,7 @@ export interface DashboardQuery extends MetricsQuery {
   additionalLabels?: string;
   workload?: string;
   workloadType?: string;
+  cluster?: string;
 }
 
 export type Aggregator = 'sum' | 'avg' | 'min' | 'max' | 'stddev' | 'stdvar';
@@ -26,6 +27,7 @@ export interface IstioMetricsOptions extends MetricsQuery {
   filters?: string[];
   requestProtocol?: string;
   reporter: Reporter;
+  cluster?: string;
 }
 
 export type Reporter = 'source' | 'destination' | 'both';
@@ -35,6 +37,7 @@ export interface Target {
   namespace: string;
   name: string;
   kind: TargetKind;
+  cluster?: string;
 }
 
 export interface MetricsStatsQuery {

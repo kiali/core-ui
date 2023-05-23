@@ -1,14 +1,14 @@
+import { ToleranceConfig } from '../ServerConfig';
 import {
   ascendingThresholdCheck,
   ThresholdStatus,
   RATIO_NA,
   HEALTHY,
   NA,
+  RequestType,
   FAILURE,
-  DEGRADED,
-  RateHealth,
-  ToleranceConfig
-} from '../';
+  DEGRADED
+} from '../Health';
 import {
   CytoscapeGlobalScratchNamespace,
   DecoratedGraphEdgeData,
@@ -18,10 +18,10 @@ import {
 } from '../Graph';
 import { aggregate, checkExpr, getRateHealthConfig, transformEdgeResponses } from './utils';
 import { RequestTolerance } from './types';
-import { decoratedEdgeData, decoratedNodeData } from '../../utils';
-import { ComputedServerConfig } from '../../config';
+import { RateHealth } from '../HealthAnnotation';
+import { decoratedEdgeData, decoratedNodeData } from '../../utils/CytoscapeGraph';
 
-export const assignEdgeHealth = (serverConfig: ComputedServerConfig, cy: any) => {
+export const assignEdgeHealth = (cy: any) => {
   const cyGlobal = cy.scratch(CytoscapeGlobalScratchNamespace);
 
   cy.edges().forEach(ele => {
@@ -39,7 +39,7 @@ export const assignEdgeHealth = (serverConfig: ComputedServerConfig, cy: any) =>
 
     const sourceNodeData = decoratedNodeData(ele.source());
     const destNodeData = decoratedNodeData(ele.target());
-    const statusEdge = getEdgeHealth(serverConfig, edgeData, sourceNodeData, destNodeData);
+    const statusEdge = getEdgeHealth(edgeData, sourceNodeData, destNodeData);
 
     switch (statusEdge.status) {
       case FAILURE:
@@ -48,8 +48,11 @@ export const assignEdgeHealth = (serverConfig: ComputedServerConfig, cy: any) =>
       case DEGRADED:
         edgeData.healthStatus = DEGRADED.name;
         return;
+      case HEALTHY:
+        edgeData.healthStatus = HEALTHY.name;
+        return;
       default:
-        // unset implies healthy or n/a
+        edgeData.healthStatus = NA.name;
         return;
     }
   });
@@ -59,7 +62,6 @@ export const assignEdgeHealth = (serverConfig: ComputedServerConfig, cy: any) =>
  Return the status for the edge from source to target
 */
 const getEdgeHealth = (
-  serverConfig: ComputedServerConfig,
   edge: DecoratedGraphEdgeData,
   source: DecoratedGraphNodeData,
   target: DecoratedGraphNodeData
@@ -69,12 +71,12 @@ const getEdgeHealth = (
   const configSource =
     annotationSource && annotationSource.toleranceConfig
       ? annotationSource.toleranceConfig
-      : getRateHealthConfig(serverConfig, source.namespace, source[source.nodeType], source.nodeType).tolerance;
+      : getRateHealthConfig(source.namespace, source[source.nodeType], source.nodeType).tolerance;
   const annotationTarget = target.hasHealthConfig ? new RateHealth(target.hasHealthConfig) : undefined;
   const configTarget =
     annotationTarget && annotationTarget.toleranceConfig
       ? annotationTarget.toleranceConfig
-      : getRateHealthConfig(serverConfig, target.namespace, target[target.nodeType], target.nodeType).tolerance;
+      : getRateHealthConfig(target.namespace, target[target.nodeType], target.nodeType).tolerance;
 
   // If there is not tolerances with this configuration we'll use defaults
   const tolerancesSource = configSource.filter(tol => checkExpr(tol.direction, 'outbound'));
@@ -94,6 +96,29 @@ const getEdgeHealth = (
     : inboundEdgeStatus.status;
 };
 
+/*
+  Calculate the RequestToleranceGraph for a requests and a configuration
+  Return the calculation in the object RequestToleranceGraph
+*/
+
+export const generateRateForGraphTolerance = (tol: RequestTolerance, requests: RequestType) => {
+  // If we have a tolerance configuration then calculate
+  if (tol.tolerance) {
+    // For each requests type {<protocol:string> : { <code: string>: <rate: number> } }
+    for (let [protocol, req] of Object.entries(requests)) {
+      // Check if protocol configuration match the protocol request
+      if (checkExpr(tol!.tolerance!.protocol, protocol)) {
+        // Loop by the status code and rate for each code
+        for (let [code, value] of Object.entries(req)) {
+          // If code match the regular expression in the configuration then sum the rate
+          if (checkExpr(tol!.tolerance!.code, code)) {
+            tol.requests[protocol] = tol.requests[protocol] ? (tol.requests[protocol] as number) + value : value;
+          }
+        }
+      }
+    }
+  }
+};
 /*
 Calculate the status of the edge with more priority given the results in requestsTolerances: RequestToleranceGraph[]
 

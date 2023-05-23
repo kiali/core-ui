@@ -8,7 +8,7 @@ export enum StatusKey {
   MESH_VERSION = 'Mesh version'
 }
 
-export type StatusT = { [K in StatusKey]?: string };
+type Status = { [K in StatusKey]?: string };
 
 export interface ExternalServiceInfo {
   name: string;
@@ -22,18 +22,8 @@ export interface IstioEnvironment {
 }
 
 export interface StatusState {
-  status: StatusT;
+  status: Status;
   externalServices: ExternalServiceInfo[];
   warningMessages: string[];
   istioEnvironment: IstioEnvironment;
 }
-
-export const INITIAL_STATUS_STATE: StatusState = {
-  status: {},
-  externalServices: [],
-  warningMessages: [],
-  istioEnvironment: {
-    isMaistra: false,
-    istioAPIEnabled: true
-  }
-};

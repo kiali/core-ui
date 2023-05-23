@@ -1,4 +1,6 @@
-import { AppHealth, Namespace, ObjectReference } from './';
+import { Namespace } from './Namespace';
+import { AppHealth } from './Health';
+import { ObjectReference } from './IstioObjects';
 
 export interface AppList {
   namespace: Namespace;
@@ -7,7 +9,9 @@ export interface AppList {
 
 export interface AppOverview {
   name: string;
+  cluster: string;
   istioSidecar: boolean;
+  istioAmbient: boolean;
   labels: { [key: string]: string };
   istioReferences: ObjectReference[];
   health: AppHealth;

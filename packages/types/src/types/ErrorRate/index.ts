@@ -1,6 +1,6 @@
 import { getTrafficHealth } from './TrafficHealth';
-import { calculateErrorRate, calculateStatus, sumRequests } from './ErrorRate';
-import { aggregate, DEFAULTCONF, getRateHealthConfig } from './utils';
+import { aggregate, calculateErrorRate, calculateStatus, sumRequests } from './ErrorRate';
+import { DEFAULTCONF, getRateHealthConfig } from './utils';
 
 export { calculateErrorRate, DEFAULTCONF, getTrafficHealth };
 

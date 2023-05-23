@@ -1,10 +1,6 @@
 // First is timestamp, second is value, third is y0
 export type Datapoint = [number, number, number?];
 
-export type MetricsStatsState = {
-  data: Map<string, MetricsStats>;
-};
-
 export interface Metric {
   labels: Labels;
   datapoints: Datapoint[];

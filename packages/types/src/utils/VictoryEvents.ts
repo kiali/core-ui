@@ -1,4 +1,4 @@
-import { RawOrBucket, LineInfo } from '../types';
+import { RawOrBucket, LineInfo } from '../types/VictoryChartInfo';
 
 interface EventItem {
   legendName: string;

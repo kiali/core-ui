@@ -1,4 +1,4 @@
-import { HealthConfig, RegexConfig } from '../types';
+import { HealthConfig, RegexConfig } from '../types/ServerConfig';
 
 const allMatch = new RegExp('.*');
 

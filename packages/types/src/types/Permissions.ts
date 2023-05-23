@@ -1,4 +1,4 @@
-import { ComputedServerConfig } from '../config/';
+import { serverConfig } from '../config';
 
 export interface ResourcePermissions {
   create: boolean;
@@ -6,14 +6,14 @@ export interface ResourcePermissions {
   delete: boolean;
 }
 
-export function canCreate(serverConfig: ComputedServerConfig, privs?: ResourcePermissions) {
+export function canCreate(privs?: ResourcePermissions) {
   return privs !== undefined && privs.create && !serverConfig.deployment.viewOnlyMode;
 }
 
-export function canUpdate(serverConfig: ComputedServerConfig, privs?: ResourcePermissions) {
+export function canUpdate(privs?: ResourcePermissions) {
   return privs !== undefined && privs.update && !serverConfig.deployment.viewOnlyMode;
 }
 
-export function canDelete(serverConfig: ComputedServerConfig, privs?: ResourcePermissions) {
+export function canDelete(privs?: ResourcePermissions) {
   return privs?.delete && !serverConfig.deployment.viewOnlyMode;
 }

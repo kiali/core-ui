@@ -1,5 +1,4 @@
 export * from './IstioActions';
-export * from './IstioConfig';
 export * from './Label';
 export * from './MTls';
 export * from './Overview';

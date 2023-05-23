@@ -27,8 +27,8 @@ const titleStyle = style({
 // Used in App/Workload/Service Description
 // It doesn't hide healthy lines as opposed to the HealthDetails
 // Keep it on this class for easy maintenance in future steps, duplication of code is expected.
-export const renderTrafficStatus = (serverConfig: ComputedServerConfig, health: Health) => {
-  const config = health.getStatusConfig(serverConfig);
+export const renderTrafficStatus = (health: Health) => {
+  const config = health.getStatusConfig();
   const isValueInConfig = config && health.health.statusConfig ? health.health.statusConfig.value > 0 : false;
   const item = health.getTrafficStatus();
   if (item) {
@@ -76,8 +76,8 @@ export const renderTrafficStatus = (serverConfig: ComputedServerConfig, health: 
 };
 
 export class HealthDetails extends React.PureComponent<Props, {}> {
-  renderErrorRate = (serverConfig: ComputedServerConfig, item: HealthItem, idx: number) => {
-    const config = this.props.health.getStatusConfig(serverConfig);
+  renderErrorRate = (item: HealthItem, idx: number) => {
+    const config = this.props.health.getStatusConfig();
     const isValueInConfig =
       config && this.props.health.health.statusConfig ? this.props.health.health.statusConfig.value > 0 : false;
 
@@ -125,9 +125,9 @@ export class HealthDetails extends React.PureComponent<Props, {}> {
     );
   };
 
-  renderChildren = (serverConfig: ComputedServerConfig, item: HealthItem, idx: number) => {
+  renderChildren = (item: HealthItem, idx: number) => {
     return item.title.startsWith(TRAFFICSTATUS) ? (
-      this.renderErrorRate(serverConfig, item, idx)
+      this.renderErrorRate(item, idx)
     ) : (
       <div key={idx}>
         {<>{item.title + (item.text && item.text.length > 0 ? ': ' : '')}</>}
@@ -151,7 +151,7 @@ export class HealthDetails extends React.PureComponent<Props, {}> {
   render() {
     const health = this.props.health;
     return health.health.items.map((item, idx) => {
-      return this.renderChildren(this.props.serverConfig, item, idx);
+      return this.renderChildren(item, idx);
     });
   }
 }

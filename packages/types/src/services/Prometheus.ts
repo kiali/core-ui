@@ -1,5 +1,5 @@
 import { DurationInSeconds } from '../types/Common';
-import { ComputedServerConfig } from '../config/ServerConfig';
+import { serverConfig } from '../config/ServerConfig';
 
 // The step needs to minimally cover 2 datapoints to get any sort of average. So 2*scrape is the bare
 // minimum.  We set rateInterval=step which basically gives us the rate() of each disjoint set.
@@ -15,7 +15,6 @@ export interface PrometheusRateParams {
 }
 
 export const computePrometheusRateParams = (
-  serverConfig: ComputedServerConfig,
   duration: DurationInSeconds,
   dataPoints?: number,
   scrapeInterval?: DurationInSeconds

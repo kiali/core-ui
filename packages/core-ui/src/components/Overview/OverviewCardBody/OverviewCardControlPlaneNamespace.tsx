@@ -126,7 +126,7 @@ class OverviewCardControlPlaneNamespace extends React.Component<ControlPlaneProp
                         <b>Memory</b>
                       </FlexItem>
                       <FlexItem>
-                        {getName(this.props.config, this.props.duration).toLowerCase()}
+                        {getName(this.props.duration).toLowerCase()}
                         <Tooltip
                           position={TooltipPosition.right}
                           content={
@@ -172,7 +172,7 @@ class OverviewCardControlPlaneNamespace extends React.Component<ControlPlaneProp
                         <b>CPU</b>
                       </FlexItem>
                       <FlexItem>
-                        {getName(this.props.config, this.props.duration).toLowerCase()}
+                        {getName(this.props.duration).toLowerCase()}
                         <Tooltip
                           position={TooltipPosition.right}
                           content={

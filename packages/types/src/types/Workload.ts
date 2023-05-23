@@ -1,4 +1,6 @@
-import { Namespace, ObjectReference, Pod, Service, Validations, WorkloadHealth, WorkloadHealthResponse } from './';
+import { Namespace } from './Namespace';
+import { WorkloadHealth, WorkloadHealthResponse } from './Health';
+import { ObjectReference, Pod, Service, Validations } from './IstioObjects';
 
 export interface WorkloadId {
   namespace: string;
@@ -7,11 +9,13 @@ export interface WorkloadId {
 
 export interface Workload {
   name: string;
+  cluster?: string;
   type: string;
   createdAt: string;
   resourceVersion: string;
   istioInjectionAnnotation?: boolean;
   istioSidecar: boolean;
+  istioAmbient: boolean;
   labels: { [key: string]: string };
   appLabel: boolean;
   versionLabel: boolean;
@@ -24,6 +28,7 @@ export interface Workload {
   runtimes: Runtime[];
   additionalDetails: AdditionalItem[];
   validations?: Validations;
+  waypointWorkloads: Workload[];
 }
 
 export const emptyWorkload: Workload = {
@@ -32,6 +37,7 @@ export const emptyWorkload: Workload = {
   createdAt: '',
   resourceVersion: '',
   istioSidecar: true, // true until proven otherwise
+  istioAmbient: false,
   labels: {},
   appLabel: false,
   versionLabel: false,
@@ -41,7 +47,8 @@ export const emptyWorkload: Workload = {
   annotations: {},
   services: [],
   runtimes: [],
-  additionalDetails: []
+  additionalDetails: [],
+  waypointWorkloads: []
 };
 
 export const WorkloadType = {
@@ -56,10 +63,12 @@ export const WorkloadType = {
   StatefulSet: 'StatefulSet'
 };
 
-export interface WorkloadOverview {
+interface WorkloadOverview {
   name: string;
+  cluster: string;
   type: string;
   istioSidecar: boolean;
+  istioAmbient: boolean;
   additionalDetailSample?: AdditionalItem;
   appLabel: boolean;
   versionLabel: boolean;
@@ -67,9 +76,6 @@ export interface WorkloadOverview {
   istioReferences: ObjectReference[];
   notCoveredAuthPolicy: boolean;
   health: WorkloadHealth;
-  resourceVersion: string;
-  createdAt: string;
-  serviceAccountNames: string[];
 }
 
 export interface WorkloadListItem extends WorkloadOverview {

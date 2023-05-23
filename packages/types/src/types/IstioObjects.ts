@@ -1,4 +1,6 @@
-import { ProxyStatus } from './HealthStatus';
+import { Namespace } from './Namespace';
+import { ServicePort } from './ServiceInfo';
+import { ProxyStatus } from './Health';
 import { TimeInSeconds } from './Common';
 import { KIALI_RELATED_LABEL, KIALI_WIZARD_LABEL } from './IstioWizards';
 import { PFColorVal } from './PfColors';
@@ -155,6 +157,7 @@ export interface Port {
 
 export interface Pod {
   name: string;
+  annotations?: { [key: string]: string };
   labels?: { [key: string]: string };
   createdAt: string;
   createdBy: PodReference[];
@@ -283,6 +286,17 @@ export interface RouteSummary {
 
 export interface BootstrapSummary {
   bootstrap: any;
+}
+
+export interface Service {
+  name: string;
+  createdAt: string;
+  resourceVersion: string;
+  namespace: Namespace;
+  labels?: { [key: string]: string };
+  type: string;
+  ip: string;
+  ports?: ServicePort[];
 }
 
 export interface Host {

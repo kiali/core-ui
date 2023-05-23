@@ -1,6 +1,9 @@
 import deepFreeze from 'deep-freeze';
 import { UNIT_TIME, MILLISECONDS } from '../types/Common';
 
+// We assume this is always defined in the .env file
+const documentationUrl = process.env.REACT_APP_KIALI_DOC_URL!;
+
 const conf = {
   /** Configuration related with session */
   session: {
@@ -77,7 +80,7 @@ const conf = {
   },
   /** */
   documentation: {
-    url: 'https://www.kiali.io/documentation/'
+    url: documentationUrl
   },
   /**  Login configuration */
   login: {
@@ -125,6 +128,10 @@ const conf = {
       istioConfigCreate: (namespace: string, objectType: string) => `api/namespaces/${namespace}/istio/${objectType}`,
       istioConfigDetail: (namespace: string, objectType: string, object: string) =>
         `api/namespaces/${namespace}/istio/${objectType}/${object}`,
+      istioConfigDelete: (namespace: string, objectType: string, object: string) =>
+        `api/namespaces/${namespace}/istio/${objectType}/${object}`,
+      istioConfigUpdate: (namespace: string, objectType: string, object: string) =>
+        `api/namespaces/${namespace}/istio/${objectType}/${object}`,
       istioPermissions: 'api/istio/permissions',
       jaeger: 'api/jaeger',
       appTraces: (namespace: string, app: string) => `api/namespaces/${namespace}/apps/${app}/traces`,
@@ -167,8 +174,8 @@ const conf = {
       workload: (namespace: string, workload: string) => `api/namespaces/${namespace}/workloads/${workload}`,
       workloadGraphElements: (namespace: string, workload: string) =>
         `api/namespaces/${namespace}/workloads/${workload}/graph`,
-      workloadHealth: (namespace: string, workload: string) =>
-        `api/namespaces/${namespace}/workloads/${workload}/health`,
+      workloadHealth: (cluster: string, namespace: string, workload: string) =>
+        `api/namespaces/${namespace}/workloads/${workload}/health?cluster=${cluster}`,
       workloadMetrics: (namespace: string, workload: string) =>
         `api/namespaces/${namespace}/workloads/${workload}/metrics`,
       workloadDashboard: (namespace: string, workload: string) =>
