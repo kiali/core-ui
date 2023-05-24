@@ -87,7 +87,7 @@ type OnEvents = {
   ): void;
 };
 
-export default class GraphDataSource {
+export class GraphDataSource {
   public graphDuration: DurationInSeconds;
   public graphTimestamp: TimeInSeconds;
 

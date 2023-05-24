@@ -3,7 +3,7 @@ import { toValidDuration } from '../config/ServerConfig';
 import { BoundsInMilliseconds } from '../types/Common';
 
 const webRoot = (window as any).WEB_ROOT ? (window as any).WEB_ROOT : undefined;
-const baseName = webRoot && webRoot !== '/' ? webRoot + '/console' : '/console';
+const baseName = webRoot && webRoot !== '/' ? webRoot + '/' : '/';
 const historyMode = (window as any).HISTORY_MODE ? (window as any).HISTORY_MODE : 'browser';
 export const history = process.env.TEST_RUNNER
   ? createMemoryHistory()

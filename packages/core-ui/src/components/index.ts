@@ -1,4 +1,3 @@
-export * from './IstioActions';
 export * from './Label';
 export * from './MTls';
 export * from './Overview';

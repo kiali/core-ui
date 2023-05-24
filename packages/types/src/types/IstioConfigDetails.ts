@@ -55,7 +55,8 @@ export interface IstioConfigDetails {
 
 export const aceOptions: AceOptions = {
   showPrintMargin: false,
-  autoScrollEditorIntoView: true
+  autoScrollEditorIntoView: true,
+  useWorker: false
 };
 
 export const safeDumpOptions = {
