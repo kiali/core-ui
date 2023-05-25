@@ -31,3 +31,19 @@ export const rootReducer = combineReducers<KialiAppState, KialiAppAction>({
   tourState: TourState,
   metricsStats: MetricsStatsReducer
 });
+
+export {
+  messageCenter,
+  loginState,
+  HelpDropdownState,
+  graphDataState,
+  globalState,
+  namespaceState,
+  UserSettingsState,
+  TourState,
+  MeshTlsState,
+  IstioStatusState,
+  JaegerStateReducer,
+  MetricsStatsReducer,
+  IstioCertsInfoState
+};
