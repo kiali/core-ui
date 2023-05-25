@@ -21,7 +21,7 @@ Assuming your working directory tree is:
 |- core-ui
 ```
 
-Before linking core-ui and types libraries, react and react-dom dependencies from application ui need to be linked to use same version in both places.
+Before linking core-ui and types libraries, react, react-dom and react-redux dependencies from application ui need to be linked to use same version in both places.
 
 ```sh
 cd work/application-ui
@@ -38,6 +38,10 @@ yarn link
 cd work/application-ui/node_modules/react-dom
 # Create link for react-dom
 yarn link
+
+cd work/application-ui/node_modules/react-redux
+# Create link for react-redux
+yarn link
 ```
 
 Then core-ui library link is created and use react and react-dom links in the library.
@@ -46,13 +50,17 @@ Then core-ui library link is created and use react and react-dom links in the li
 # Install core-ui library dependencies
 yarn install
 
-cd work/core-ui/packages/core-ui
+cd work/core-ui
 # Link react library
 yarn link react
 
 # Link react-dom library
 yarn link react-dom
 
+# Link react-dom library
+yarn link react-redux
+
+cd work/core-ui/packages/core-ui
 # Create link for core-ui
 yarn link
 
@@ -87,6 +95,9 @@ yarn unlink react
 
 # Unlink react-dom library
 yarn unlink react-dom
+
+# Unlink react-redux library
+yarn unlink react-redux
 
 cd work/core-ui
 # Reinstalling core-ui dependencies
