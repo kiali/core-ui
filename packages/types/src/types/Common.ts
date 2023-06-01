@@ -98,3 +98,7 @@ export const isEqualTimeRange = (t1: TimeRange, t2: TimeRange): boolean => {
   }
   return true;
 };
+
+export interface Response<T> {
+  data: T;
+}

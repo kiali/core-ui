@@ -4,7 +4,7 @@ import { LoginSession } from '../store/Store';
 import { App } from '../types/App';
 import { AppList } from '../types/AppList';
 import { AuthInfo } from '../types/Auth';
-import { DurationInSeconds, HTTP_VERBS, Password, TimeInSeconds, UserName } from '../types/Common';
+import { DurationInSeconds, HTTP_VERBS, Password, Response, TimeInSeconds, UserName } from '../types/Common';
 import { DashboardModel } from '../types/Dashboards';
 import { GrafanaInfo } from '../types/GrafanaInfo';
 import { GraphDefinition, NodeParamsType, NodeType } from '../types/Graph';
@@ -39,15 +39,11 @@ import { KialiCrippledFeatures, ServerConfig } from '../types/ServerConfig';
 import { StatusState } from '../types/StatusState';
 import { ServiceDetailsInfo } from '../types/ServiceInfo';
 import { ServiceList } from '../types/ServiceList';
-import { Span, TracingQuery } from '../types/Tracing';
+import { TracingSpan, TracingQuery } from '../types/Tracing';
 import { TLSStatus } from '../types/TLSStatus';
 import { Workload, WorkloadNamespaceResponse } from '../types/Workload';
 import { CertsInfo } from '../types/CertsInfo';
 export const ANONYMOUS_USER = 'anonymous';
-
-export interface Response<T> {
-  data: T;
-}
 
 const getKialiProxy = (): string | null => {
   return process.env.KIALI_PROXY ?? null;
@@ -760,7 +756,7 @@ export const getAppSpans = (namespace: string, app: string, params: TracingQuery
   if (cluster) {
     queryParams.cluster = cluster;
   }
-  return newRequest<Span[]>(HTTP_VERBS.GET, urls.appSpans(namespace, app), queryParams, {});
+  return newRequest<TracingSpan[]>(HTTP_VERBS.GET, urls.appSpans(namespace, app), queryParams, {});
 };
 
 export const getServiceSpans = (namespace: string, service: string, params: TracingQuery, cluster?: string) => {
@@ -768,7 +764,7 @@ export const getServiceSpans = (namespace: string, service: string, params: Trac
   if (cluster) {
     queryParams.cluster = cluster;
   }
-  return newRequest<Span[]>(HTTP_VERBS.GET, urls.serviceSpans(namespace, service), queryParams, {});
+  return newRequest<TracingSpan[]>(HTTP_VERBS.GET, urls.serviceSpans(namespace, service), queryParams, {});
 };
 
 export const getWorkloadSpans = (namespace: string, workload: string, params: TracingQuery, cluster?: string) => {
@@ -776,7 +772,7 @@ export const getWorkloadSpans = (namespace: string, workload: string, params: Tr
   if (cluster) {
     queryParams.cluster = cluster;
   }
-  return newRequest<Span[]>(HTTP_VERBS.GET, urls.workloadSpans(namespace, workload), queryParams, {});
+  return newRequest<TracingSpan[]>(HTTP_VERBS.GET, urls.workloadSpans(namespace, workload), queryParams, {});
 };
 
 export const getIstioPermissions = (namespaces: string[], cluster?: string) => {

@@ -38,6 +38,7 @@ export * from './SortFilters';
 export * from './StatusState';
 export * from './TLSStatus';
 export * from './Tour';
+export * from './Tracing';
 export * from './Traffic';
 export * from './VictoryChartInfo';
 export * from './Workload';

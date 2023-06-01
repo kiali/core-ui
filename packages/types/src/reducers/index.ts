@@ -8,7 +8,7 @@ import graphDataState from './GraphDataState';
 import globalState from './GlobalState';
 import namespaceState from './NamespaceState';
 import UserSettingsState from './UserSettingsState';
-import tourState from './TourState';
+import TourStateReducer from './TourState';
 import { KialiAppAction } from '../actions/KialiAppAction';
 import MeshTlsState from './MeshTlsState';
 import IstioStatusState from './IstioStatusState';
@@ -28,7 +28,7 @@ export const rootReducer = combineReducers<KialiAppState, KialiAppAction>({
   meshTLSStatus: MeshTlsState,
   istioStatus: IstioStatusState,
   istioCertsInfo: IstioCertsInfoState,
-  tourState: tourState,
+  tourState: TourStateReducer,
   metricsStats: MetricsStatsReducer
 });
 
@@ -40,7 +40,7 @@ export {
   globalState,
   namespaceState,
   UserSettingsState,
-  tourState,
+  TourStateReducer,
   MeshTlsState,
   IstioStatusState,
   JaegerStateReducer,
