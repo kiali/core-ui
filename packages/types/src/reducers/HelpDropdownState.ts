@@ -13,7 +13,7 @@ export const INITIAL_STATUS_STATE: StatusState = {
   }
 };
 
-const HelpDropdownState = (state: StatusState = INITIAL_STATUS_STATE, action: KialiAppAction): StatusState => {
+export const HelpDropdownState = (state: StatusState = INITIAL_STATUS_STATE, action: KialiAppAction): StatusState => {
   switch (action.type) {
     case getType(HelpDropdownActions.statusRefresh):
       return {
@@ -27,5 +27,3 @@ const HelpDropdownState = (state: StatusState = INITIAL_STATUS_STATE, action: Ki
       return state;
   }
 };
-
-export default HelpDropdownState;

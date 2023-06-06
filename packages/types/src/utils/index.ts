@@ -16,5 +16,6 @@ export * from './SafeRender';
 export * from './SearchParamUtils';
 export * from './TimeSeriesUtils';
 export * from './tracing';
+export * from './TrafficRate';
 export * from './VictoryChartsUtils';
 export * from './VictoryEvents';

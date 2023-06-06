@@ -21,5 +21,3 @@ export const MetricsStatsReducer = (
       return state;
   }
 };
-
-export default MetricsStatsReducer;

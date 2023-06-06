@@ -1,49 +1,14 @@
-import { combineReducers } from 'redux';
-
-import { KialiAppState } from '../store/Store';
-import messageCenter from './MessageCenter';
-import loginState from './LoginState';
-import HelpDropdownState from './HelpDropdownState';
-import graphDataState from './GraphDataState';
-import globalState from './GlobalState';
-import namespaceState from './NamespaceState';
-import UserSettingsState from './UserSettingsState';
-import TourStateReducer from './TourState';
-import { KialiAppAction } from '../actions/KialiAppAction';
-import MeshTlsState from './MeshTlsState';
-import IstioStatusState from './IstioStatusState';
-import JaegerStateReducer from './JaegerState';
-import MetricsStatsReducer from './MetricsStatsState';
-import IstioCertsInfoState from './IstioCertsInfoState';
-
-export const rootReducer = combineReducers<KialiAppState, KialiAppAction>({
-  authentication: loginState,
-  globalState: globalState,
-  graph: graphDataState,
-  messageCenter,
-  namespaces: namespaceState,
-  statusState: HelpDropdownState,
-  userSettings: UserSettingsState,
-  jaegerState: JaegerStateReducer,
-  meshTLSStatus: MeshTlsState,
-  istioStatus: IstioStatusState,
-  istioCertsInfo: IstioCertsInfoState,
-  tourState: TourStateReducer,
-  metricsStats: MetricsStatsReducer
-});
-
-export {
-  messageCenter,
-  loginState,
-  HelpDropdownState,
-  graphDataState,
-  globalState,
-  namespaceState,
-  UserSettingsState,
-  TourStateReducer,
-  MeshTlsState,
-  IstioStatusState,
-  JaegerStateReducer,
-  MetricsStatsReducer,
-  IstioCertsInfoState
-};
+export * from './GlobalState';
+export * from './GraphDataState';
+export * from './HelpDropdownState';
+export * from './IstioCertsInfoState';
+export * from './IstioStatusState';
+export * from './JaegerState';
+export * from './LoginState';
+export * from './MeshTlsState';
+export * from './MetricsStatsState';
+export * from './MessageCenter';
+export * from './NamespaceState';
+export * from './RootReducer';
+export * from './TourState';
+export * from './UserSettingsState';
