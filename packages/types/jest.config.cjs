@@ -1,6 +1,6 @@
 module.exports = {
   collectCoverage: true,
-  collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}', '!<rootDir>/node_modules/'],
+  collectCoverageFrom: ['src/components/**/*.{js,jsx,ts,tsx}', '!<rootDir>/node_modules/'],
   /*coverageThreshold: {
     global: {
       lines: 80,
@@ -10,18 +10,15 @@ module.exports = {
   },*/
   coverageReporters: ['json-summary', 'text', 'lcov'],
   coverageDirectory: '.coverage',
-  testEnvironment: 'node',
+  testEnvironment: 'jsdom',
+  setupFilesAfterEnv: ['@testing-library/jest-dom/extend-expect'],
   transform: {
-    '^.+\\.(ts|tsx|js|jsx)$': [
+    '^.+\\.(ts|tsx)$': [
       'ts-jest',
       {
         useESM: true
       }
     ]
   },
-  extensionsToTreatAsEsm: ['.ts', '.tsx'],
-  modulePathIgnorePatterns: ['<rootDir>/lib/'],
-  restoreMocks: true,
-  clearMocks: true,
-  resetMocks: true
+  modulePathIgnorePatterns: ['<rootDir>/lib/']
 };

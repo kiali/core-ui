@@ -14,7 +14,7 @@ module.exports = {
   setupFilesAfterEnv: ['@testing-library/jest-dom/extend-expect'],
   setupFiles: ['./setupTests.ts'],
   transform: {
-    '^.+\\.(ts|tsx|js|jsx)$': [
+    '^.+\\.(ts|tsx)$': [
       'ts-jest',
       {
         useESM: true
